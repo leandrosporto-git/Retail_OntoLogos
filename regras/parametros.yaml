@@ -1,0 +1,41 @@
+# Parâmetros das regras de diagnóstico e destinação.
+# ATENÇÃO: os limites abaixo são HIPOTÉTICOS. Precisam ser validados com
+# especialistas antes de qualquer uso real. Mudou um limite? Suba a versão.
+versao_regras: "0.1.0"
+
+limites:
+  idade_estoque_dias: 180     # acima disto o estoque é considerado antigo (C01)
+  cobertura_dias: 90          # acima disto o estoque dura mais que o desejado (C02)
+
+financeiro:
+  taxa_custo_capital_anual: 0.15   # custo de capital usado no custo de oportunidade (CQ08)
+
+criterios:
+  - id: C01
+    descricao: "Idade do estoque acima do limite"
+    indicador: IdadeEstoque
+    operador: ">"
+    limite_param: idade_estoque_dias
+  - id: C02
+    descricao: "Cobertura acima do limite ou nenhuma venda registrada no período"
+    indicador: CoberturaDias
+    operador: ">"
+    limite_param: cobertura_dias
+  - id: C03
+    descricao: "Produto de coleção encerrada"
+    indicador: null
+    operador: "="
+    limite_param: null
+  - id: C04
+    descricao: "Vendas ou idade sem registro: diagnóstico não pode ser feito"
+    indicador: null
+    operador: "ausente"
+    limite_param: null
+
+causas_provaveis:
+  - codigo: ColecaoEncerrada
+    nome: "Coleção encerrada"
+  - codigo: BaixaDemanda
+    nome: "Demanda abaixo da quantidade em estoque"
+  - codigo: EstoqueEnvelhecido
+    nome: "Estoque parado há muito tempo"

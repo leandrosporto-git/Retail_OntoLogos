@@ -1,0 +1,307 @@
+sku,descricao,categoria,colecao,custo_unitario,preco_venda
+SKU00001,Vestido Liso,Vestido,VER25,139.94,403.55
+SKU00002,Blusa Animal print,Blusa,ALV26,39.38,95.01
+SKU00003,Short Poá,Short,ALV26,66.5,202.93
+SKU00004,Short Tie-dye,Short,ALV26,,151.06
+SKU00005,Blusa Liso,Blusa,RES26,176.59,380.39
+SKU00006,Macacão Floral,Macacão,INV25,150.16,419.06
+SKU00007,Blusa Animal print,Blusa,PRI26,32.84,66.26
+SKU00008,Saia Floral,Saia,PRI26,114.73,287.18
+SKU00009,Calça Tie-dye,Calça,PRI26,67.21,162.07
+SKU00010,Short Listrado,Short,INV25,28.84,84.76
+SKU00011,Short Listrado,Short,PRI26,130.33,407.55
+SKU00012,Macacão Tie-dye,Macacão,PRI26,148.03,326.2
+SKU00013,Calça Poá,Calça,RES26,149.22,405.06
+SKU00014,Short Listrado,Short,PRI26,98.93,287.31
+SKU00015,Short Xadrez,Short,ALV26,68.13,156.88
+SKU00016,Camisa Listrado,Camisa,INV25,,112.37
+SKU00017,Short Tie-dye,Short,INV25,52.3,121.55
+SKU00018,Saia Xadrez,Saia,RES26,72.46,193.05
+SKU00019,Blusa Floral,Blusa,RES26,152.43,410.41
+SKU00020,Blusa Animal print,Blusa,RES26,131.54,387.98
+SKU00021,Jaqueta Liso,Jaqueta,RES26,,374.04
+SKU00022,Blusa Tie-dye,Blusa,ALV26,157.95,409.81
+SKU00023,Saia Listrado,Saia,VER25,66.39,167.68
+SKU00024,Blusa Xadrez,Blusa,INV25,67.82,163.3
+SKU00025,Short Floral,Short,INV25,61.2,145.77
+SKU00026,Short Tie-dye,Short,VER25,176.64,538.24
+SKU00027,Macacão Xadrez,Macacão,INV25,166.49,460.43
+SKU00028,Camisa Listrado,Camisa,VER25,147.23,423.85
+SKU00029,Macacão Poá,Macacão,INV25,28.88,69.13
+SKU00030,Blusa Floral,Blusa,INV25,172.1,481.07
+SKU00031,Calça Animal print,Calça,ALV26,178.07,393.43
+SKU00032,Vestido Tie-dye,Vestido,INV25,137.72,361.62
+SKU00033,Camisa Floral,Camisa,RES26,95.33,281.39
+SKU00034,Jaqueta Xadrez,Jaqueta,RES26,160.41,487.92
+SKU00035,Jaqueta Poá,Jaqueta,ALV26,25.95,72.37
+SKU00036,Short Poá,Short,INV25,107.55,322.65
+SKU00037,Calça Xadrez,Calça,VER25,172.45,501.03
+SKU00038,Macacão Listrado,Macacão,VER25,41.04,130.46
+SKU00039,Camisa Poá,Camisa,ALV26,137.18,418.12
+SKU00040,Jaqueta Liso,Jaqueta,INV25,171.89,550.04
+SKU00041,Camisa Liso,Camisa,RES26,141.62,373.99
+SKU00042,Saia Liso,Saia,ALV26,84.86,172.59
+SKU00043,Blusa Poá,Blusa,RES26,42.18,111.49
+SKU00044,Saia Animal print,Saia,ALV26,138.61,374.01
+SKU00045,Jaqueta Xadrez,Jaqueta,RES26,175.93,429.41
+SKU00046,Short Floral,Short,ALV26,67.56,141.2
+SKU00047,Macacão Floral,Macacão,INV25,105.25,243.56
+SKU00048,Jaqueta Liso,Jaqueta,ALV26,97.45,266.46
+SKU00049,Calça Poá,Calça,PRI26,51.54,123.96
+SKU00050,Macacão Listrado,Macacão,INV25,179.38,465.82
+SKU00051,Short Liso,Short,PRI26,102.51,292.8
+SKU00052,Macacão Animal print,Macacão,VER25,66.16,178.25
+SKU00053,Camisa Listrado,Camisa,ALV26,59.85,175.09
+SKU00054,Calça Xadrez,Calça,PRI26,88.07,226.6
+SKU00055,Camisa Poá,Camisa,ALV26,95.42,247.39
+SKU00056,Jaqueta Liso,Jaqueta,RES26,38.44,122.16
+SKU00057,Blusa Listrado,Blusa,ALV26,124.0,339.46
+SKU00058,Jaqueta Tie-dye,Jaqueta,INV25,157.45,353.71
+SKU00059,Saia Listrado,Saia,INV25,154.4,394.59
+SKU00060,Saia Poá,Saia,PRI26,89.1,279.62
+SKU00061,Saia Floral,Saia,VER25,170.26,493.12
+SKU00062,Macacão Listrado,Macacão,RES26,96.43,212.45
+SKU00063,Short Listrado,Short,PRI26,26.84,70.94
+SKU00064,Vestido Floral,Vestido,PRI26,52.8,166.52
+SKU00065,Blusa Tie-dye,Blusa,INV25,37.72,110.92
+SKU00066,Calça Xadrez,Calça,RES26,34.81,82.14
+SKU00067,Saia Animal print,Saia,PRI26,75.51,186.62
+SKU00068,Short Listrado,Short,PRI26,109.27,310.54
+SKU00069,Saia Animal print,Saia,INV25,94.1,264.94
+SKU00070,Vestido Tie-dye,Vestido,VER25,156.62,463.6
+SKU00071,Short Listrado,Short,ALV26,119.75,290.08
+SKU00072,Macacão Animal print,Macacão,RES26,50.92,148.34
+SKU00073,Saia Listrado,Saia,INV25,150.66,456.99
+SKU00074,Short Animal print,Short,ALV26,83.15,254.12
+SKU00075,Vestido Xadrez,Vestido,RES26,44.26,112.77
+SKU00076,Saia Floral,Saia,PRI26,105.51,299.09
+SKU00077,Calça Xadrez,Calça,INV25,167.58,508.1
+SKU00078,Vestido Liso,Vestido,VER25,,237.63
+SKU00079,Blusa Animal print,Blusa,ALV26,,363.62
+SKU00080,Saia Liso,Saia,VER25,32.13,71.16
+SKU00081,Vestido Animal print,Vestido,RES26,61.11,173.07
+SKU00082,Macacão Poá,Macacão,INV25,97.24,236.29
+SKU00083,Macacão Animal print,Macacão,INV25,150.44,450.6
+SKU00084,Jaqueta Listrado,Jaqueta,PRI26,85.2,231.45
+SKU00085,Jaqueta Tie-dye,Jaqueta,INV25,34.23,106.14
+SKU00086,Vestido Xadrez,Vestido,VER25,32.46,102.67
+SKU00087,Saia Poá,Saia,ALV26,39.87,119.92
+SKU00088,Vestido Xadrez,Vestido,PRI26,155.32,490.62
+SKU00089,Macacão Tie-dye,Macacão,PRI26,,459.3
+SKU00090,Calça Animal print,Calça,INV25,71.57,214.07
+SKU00091,Saia Xadrez,Saia,INV25,154.73,318.85
+SKU00092,Macacão Poá,Macacão,VER25,166.28,492.36
+SKU00093,Vestido Poá,Vestido,INV25,149.84,372.34
+SKU00094,Camisa Poá,Camisa,ALV26,156.04,346.0
+SKU00095,Saia Xadrez,Saia,INV25,78.11,169.64
+SKU00096,Short Xadrez,Short,PRI26,123.19,303.04
+SKU00097,Jaqueta Xadrez,Jaqueta,VER25,135.22,412.67
+SKU00098,Camisa Xadrez,Camisa,VER25,121.53,364.2
+SKU00099,Camisa Listrado,Camisa,VER25,124.87,289.32
+SKU00100,Vestido Tie-dye,Vestido,ALV26,158.7,502.78
+SKU00101,Calça Poá,Calça,RES26,155.05,320.25
+SKU00102,Macacão Poá,Macacão,INV25,76.46,196.33
+SKU00103,Saia Liso,Saia,INV25,43.72,111.42
+SKU00104,Calça Xadrez,Calça,INV25,138.23,385.53
+SKU00105,Camisa Floral,Camisa,PRI26,161.01,423.02
+SKU00106,Short Tie-dye,Short,RES26,89.57,212.75
+SKU00107,Jaqueta Poá,Jaqueta,RES26,36.3,82.18
+SKU00108,Blusa Animal print,Blusa,PRI26,171.97,454.96
+SKU00109,Short Xadrez,Short,RES26,86.24,188.66
+SKU00110,Macacão Tie-dye,Macacão,PRI26,172.49,480.66
+SKU00111,Camisa Tie-dye,Camisa,ALV26,100.48,274.1
+SKU00112,Calça Liso,Calça,PRI26,142.37,315.35
+SKU00113,Jaqueta Floral,Jaqueta,RES26,116.09,304.16
+SKU00114,Vestido Animal print,Vestido,PRI26,161.17,377.16
+SKU00115,Short Poá,Short,RES26,82.41,207.24
+SKU00116,Camisa Animal print,Camisa,RES26,178.22,507.32
+SKU00117,Jaqueta Liso,Jaqueta,VER25,,130.63
+SKU00118,Saia Listrado,Saia,INV25,149.03,390.43
+SKU00119,Jaqueta Poá,Jaqueta,PRI26,101.31,308.24
+SKU00120,Saia Listrado,Saia,RES26,89.96,272.15
+SKU00121,Vestido Floral,Vestido,ALV26,86.75,195.93
+SKU00122,Jaqueta Animal print,Jaqueta,ALV26,75.39,217.41
+SKU00123,Blusa Tie-dye,Blusa,VER25,65.68,204.78
+SKU00124,Calça Animal print,Calça,ALV26,,209.66
+SKU00125,Short Tie-dye,Short,RES26,59.19,135.4
+SKU00126,Jaqueta Liso,Jaqueta,VER25,37.43,77.38
+SKU00127,Blusa Floral,Blusa,PRI26,86.35,232.91
+SKU00128,Jaqueta Floral,Jaqueta,RES26,137.28,354.51
+SKU00129,Calça Xadrez,Calça,INV25,160.39,357.66
+SKU00130,Jaqueta Xadrez,Jaqueta,VER25,129.55,396.34
+SKU00131,Calça Poá,Calça,ALV26,46.45,106.83
+SKU00132,Blusa Xadrez,Blusa,PRI26,59.42,129.39
+SKU00133,Saia Xadrez,Saia,PRI26,62.56,149.4
+SKU00134,Macacão Tie-dye,Macacão,ALV26,121.57,345.08
+SKU00135,Vestido Listrado,Vestido,RES26,31.16,74.79
+SKU00136,Saia Tie-dye,Saia,PRI26,158.7,488.54
+SKU00137,Saia Floral,Saia,ALV26,117.44,285.51
+SKU00138,Blusa Floral,Blusa,VER25,95.0,290.07
+SKU00139,Calça Floral,Calça,PRI26,96.85,277.69
+SKU00140,Vestido Poá,Vestido,ALV26,96.09,285.29
+SKU00141,Blusa Tie-dye,Blusa,VER25,89.63,209.85
+SKU00142,Blusa Animal print,Blusa,PRI26,99.97,318.26
+SKU00143,Blusa Tie-dye,Blusa,VER25,131.3,352.24
+SKU00144,Jaqueta Floral,Jaqueta,VER25,146.67,371.45
+SKU00145,Vestido Liso,Vestido,ALV26,114.52,273.14
+SKU00146,Jaqueta Tie-dye,Jaqueta,RES26,73.43,213.69
+SKU00147,Saia Xadrez,Saia,PRI26,109.93,228.57
+SKU00148,Camisa Listrado,Camisa,ALV26,113.39,351.76
+SKU00149,Macacão Xadrez,Macacão,RES26,84.63,230.66
+SKU00150,Camisa Poá,Camisa,VER25,120.02,352.17
+SKU00151,Calça Listrado,Calça,RES26,148.9,473.63
+SKU00152,Jaqueta Listrado,Jaqueta,ALV26,66.9,186.33
+SKU00153,Blusa Tie-dye,Blusa,VER25,157.75,460.1
+SKU00154,Macacão Xadrez,Macacão,INV25,41.81,94.58
+SKU00155,Jaqueta Tie-dye,Jaqueta,ALV26,130.68,417.71
+SKU00156,Vestido Tie-dye,Vestido,VER25,77.59,159.17
+SKU00157,Short Tie-dye,Short,INV25,77.29,217.5
+SKU00158,Calça Xadrez,Calça,INV25,124.17,283.99
+SKU00159,Macacão Floral,Macacão,INV25,102.11,210.84
+SKU00160,Camisa Tie-dye,Camisa,ALV26,56.34,151.13
+SKU00161,Short Animal print,Short,PRI26,99.29,210.26
+SKU00162,Short Tie-dye,Short,INV25,53.67,137.24
+SKU00163,Vestido Poá,Vestido,ALV26,42.2,86.47
+SKU00164,Short Listrado,Short,ALV26,67.96,172.81
+SKU00165,Macacão Animal print,Macacão,ALV26,116.97,310.93
+SKU00166,Jaqueta Liso,Jaqueta,ALV26,47.93,126.55
+SKU00167,Saia Poá,Saia,RES26,101.02,316.4
+SKU00168,Jaqueta Animal print,Jaqueta,PRI26,35.25,86.4
+SKU00169,Blusa Floral,Blusa,RES26,82.85,249.74
+SKU00170,Jaqueta Poá,Jaqueta,PRI26,,356.76
+SKU00171,Jaqueta Tie-dye,Jaqueta,PRI26,51.69,153.91
+SKU00172,Jaqueta Animal print,Jaqueta,ALV26,79.59,228.76
+SKU00173,Calça Xadrez,Calça,VER25,154.39,348.48
+SKU00174,Blusa Liso,Blusa,RES26,139.92,290.71
+SKU00175,Macacão Animal print,Macacão,RES26,103.24,312.98
+SKU00176,Macacão Poá,Macacão,VER25,127.31,326.4
+SKU00177,Jaqueta Listrado,Jaqueta,VER25,83.99,209.5
+SKU00178,Jaqueta Xadrez,Jaqueta,RES26,50.83,113.97
+SKU00179,Camisa Poá,Camisa,RES26,170.26,514.75
+SKU00180,Vestido Xadrez,Vestido,INV25,63.07,162.88
+SKU00181,Blusa Animal print,Blusa,ALV26,86.52,187.63
+SKU00182,Vestido Floral,Vestido,ALV26,125.04,376.34
+SKU00183,Vestido Animal print,Vestido,RES26,67.48,211.12
+SKU00184,Short Xadrez,Short,PRI26,147.86,450.71
+SKU00185,Saia Animal print,Saia,VER25,135.6,403.56
+SKU00186,Vestido Xadrez,Vestido,PRI26,25.83,61.04
+SKU00187,Jaqueta Listrado,Jaqueta,ALV26,168.57,461.13
+SKU00188,Camisa Liso,Camisa,INV25,112.3,303.24
+SKU00189,Macacão Tie-dye,Macacão,VER25,75.36,232.73
+SKU00190,Camisa Liso,Camisa,RES26,125.31,268.76
+SKU00191,Macacão Tie-dye,Macacão,VER25,71.56,220.65
+SKU00192,Saia Poá,Saia,INV25,53.69,124.09
+SKU00193,Camisa Liso,Camisa,RES26,38.58,82.34
+SKU00194,Vestido Animal print,Vestido,RES26,76.75,219.18
+SKU00195,Macacão Tie-dye,Macacão,ALV26,45.33,111.89
+SKU00196,Jaqueta Animal print,Jaqueta,ALV26,146.66,447.79
+SKU00197,Calça Liso,Calça,VER25,125.3,269.09
+SKU00198,Calça Tie-dye,Calça,VER25,164.89,523.7
+SKU00199,Camisa Liso,Camisa,PRI26,105.81,214.59
+SKU00200,Saia Liso,Saia,PRI26,41.31,123.41
+SKU00201,Calça Listrado,Calça,VER25,43.25,102.24
+SKU00202,Macacão Tie-dye,Macacão,RES26,128.42,306.96
+SKU00203,Jaqueta Floral,Jaqueta,VER25,84.21,223.17
+SKU00204,Saia Xadrez,Saia,PRI26,101.41,318.35
+SKU00205,Camisa Listrado,Camisa,PRI26,155.12,467.05
+SKU00206,Camisa Listrado,Camisa,RES26,63.12,142.19
+SKU00207,Blusa Xadrez,Blusa,VER25,96.72,194.53
+SKU00208,Calça Liso,Calça,VER25,65.24,199.45
+SKU00209,Saia Poá,Saia,VER25,32.28,81.95
+SKU00210,Saia Animal print,Saia,RES26,173.61,416.72
+SKU00211,Camisa Poá,Camisa,VER25,156.74,454.92
+SKU00212,Calça Xadrez,Calça,INV25,123.79,319.09
+SKU00213,Saia Floral,Saia,INV25,124.29,299.52
+SKU00214,Calça Liso,Calça,ALV26,77.67,173.61
+SKU00215,Blusa Liso,Blusa,RES26,43.37,128.11
+SKU00216,Saia Animal print,Saia,VER25,59.03,134.66
+SKU00217,Saia Animal print,Saia,ALV26,134.37,390.06
+SKU00218,Short Liso,Short,INV25,144.37,364.74
+SKU00219,Short Tie-dye,Short,VER25,68.99,181.39
+SKU00220,Macacão Listrado,Macacão,RES26,49.61,134.19
+SKU00221,Blusa Liso,Blusa,INV25,86.0,263.39
+SKU00222,Short Liso,Short,RES26,78.27,193.8
+SKU00223,Camisa Floral,Camisa,RES26,93.82,274.6
+SKU00224,Saia Xadrez,Saia,ALV26,121.82,380.9
+SKU00225,Macacão Poá,Macacão,ALV26,,90.02
+SKU00226,Saia Xadrez,Saia,VER25,168.13,485.41
+SKU00227,Blusa Liso,Blusa,VER25,159.83,329.65
+SKU00228,Short Listrado,Short,RES26,157.38,427.16
+SKU00229,Calça Listrado,Calça,PRI26,55.11,161.23
+SKU00230,Blusa Listrado,Blusa,VER25,123.61,368.0
+SKU00231,Vestido Floral,Vestido,ALV26,128.12,271.13
+SKU00232,Short Tie-dye,Short,RES26,,401.0
+SKU00233,Macacão Liso,Macacão,VER25,127.71,281.54
+SKU00234,Jaqueta Xadrez,Jaqueta,VER25,44.75,120.48
+SKU00235,Saia Liso,Saia,INV25,156.45,444.39
+SKU00236,Short Animal print,Short,INV25,172.31,379.4
+SKU00237,Macacão Listrado,Macacão,RES26,179.99,483.4
+SKU00238,Saia Animal print,Saia,VER25,30.69,92.04
+SKU00239,Calça Animal print,Calça,PRI26,90.05,226.96
+SKU00240,Jaqueta Poá,Jaqueta,VER25,133.57,310.59
+SKU00241,Camisa Tie-dye,Camisa,PRI26,67.75,207.16
+SKU00242,Macacão Poá,Macacão,RES26,104.83,297.45
+SKU00243,Jaqueta Xadrez,Jaqueta,PRI26,172.63,380.58
+SKU00244,Short Xadrez,Short,INV25,79.95,178.85
+SKU00245,Vestido Tie-dye,Vestido,ALV26,143.94,431.22
+SKU00246,Saia Floral,Saia,RES26,98.45,279.73
+SKU00247,Blusa Listrado,Blusa,ALV26,66.73,190.44
+SKU00248,Saia Floral,Saia,INV25,134.22,420.13
+SKU00249,Calça Floral,Calça,VER25,113.64,347.17
+SKU00250,Jaqueta Liso,Jaqueta,VER25,58.99,136.1
+SKU00251,Blusa Animal print,Blusa,RES26,137.27,407.64
+SKU00252,Blusa Poá,Blusa,ALV26,56.36,173.07
+SKU00253,Camisa Xadrez,Camisa,ALV26,79.0,220.73
+SKU00254,Short Xadrez,Short,INV25,79.65,225.58
+SKU00255,Camisa Poá,Camisa,INV25,96.36,305.09
+SKU00256,Camisa Xadrez,Camisa,INV25,97.88,287.54
+SKU00257,Vestido Tie-dye,Vestido,PRI26,58.93,186.88
+SKU00258,Jaqueta Floral,Jaqueta,RES26,175.95,421.85
+SKU00259,Macacão Listrado,Macacão,ALV26,146.73,403.24
+SKU00260,Calça Xadrez,Calça,RES26,170.67,349.45
+SKU00261,Macacão Animal print,Macacão,ALV26,97.62,249.69
+SKU00262,Calça Listrado,Calça,VER25,35.74,108.95
+SKU00263,Calça Tie-dye,Calça,VER25,75.18,217.38
+SKU00264,Vestido Listrado,Vestido,INV25,82.39,253.43
+SKU00265,Saia Listrado,Saia,VER25,157.73,498.61
+SKU00266,Blusa Tie-dye,Blusa,INV25,39.46,115.38
+SKU00267,Camisa Liso,Camisa,RES26,127.18,350.12
+SKU00268,Saia Listrado,Saia,VER25,131.54,363.08
+SKU00269,Blusa Listrado,Blusa,INV25,79.03,202.35
+SKU00270,Jaqueta Listrado,Jaqueta,INV25,63.02,154.17
+SKU00271,Jaqueta Floral,Jaqueta,PRI26,116.63,273.15
+SKU00272,Jaqueta Listrado,Jaqueta,VER25,101.54,287.94
+SKU00273,Vestido Floral,Vestido,ALV26,42.17,97.69
+SKU00274,Macacão Poá,Macacão,INV25,41.2,120.05
+SKU00275,Blusa Xadrez,Blusa,PRI26,79.94,208.05
+SKU00276,Macacão Listrado,Macacão,ALV26,56.88,157.23
+SKU00277,Macacão Listrado,Macacão,VER25,,279.24
+SKU00278,Macacão Poá,Macacão,ALV26,101.05,233.3
+SKU00279,Short Liso,Short,INV25,80.71,250.59
+SKU00280,Camisa Xadrez,Camisa,RES26,35.02,71.76
+SKU00281,Short Liso,Short,INV25,115.71,235.88
+SKU00282,Calça Liso,Calça,VER25,120.36,324.54
+SKU00283,Calça Floral,Calça,INV25,71.64,212.54
+SKU00284,Camisa Animal print,Camisa,INV25,152.36,425.05
+SKU00285,Short Xadrez,Short,RES26,133.14,396.25
+SKU00286,Jaqueta Liso,Jaqueta,INV25,102.6,248.15
+SKU00287,Camisa Poá,Camisa,PRI26,45.06,108.94
+SKU00288,Short Listrado,Short,RES26,167.97,359.01
+SKU00289,Saia Tie-dye,Saia,PRI26,,81.09
+SKU00290,Blusa Poá,Blusa,ALV26,107.84,336.26
+SKU00291,Vestido Xadrez,Vestido,PRI26,78.61,213.64
+SKU00292,Vestido Tie-dye,Vestido,PRI26,,410.76
+SKU00293,Blusa Poá,Blusa,ALV26,56.55,128.74
+SKU00294,Jaqueta Animal print,Jaqueta,VER25,168.02,487.93
+SKU00295,Macacão Floral,Macacão,RES26,,87.44
+SKU00296,Jaqueta Floral,Jaqueta,RES26,31.5,98.97
+SKU00297,Jaqueta Tie-dye,Jaqueta,ALV26,76.92,188.43
+SKU00298,Blusa Poá,Blusa,VER25,173.59,452.06
+SKU00299,Camisa Floral,Camisa,PRI26,148.36,311.23
+SKU00300,Blusa Listrado,Blusa,ALV26,77.21,209.22
+CTRL-ATIVO,Caso de controle CTRL-ATIVO,Controle,PRI26,100.0,250.0
+CTRL-EXCESSO,Caso de controle CTRL-EXCESSO,Controle,RES26,100.0,250.0
+CTRL-ENVELHECIDO,Caso de controle CTRL-ENVELHECIDO,Controle,INV25,100.0,250.0
+CTRL-OBSOLETO,Caso de controle CTRL-OBSOLETO,Controle,VER25,100.0,250.0
+CTRL-SEMVENDA,Caso de controle CTRL-SEMVENDA,Controle,VER25,100.0,250.0
+CTRL-SEMDADO,Caso de controle CTRL-SEMDADO,Controle,RES26,100.0,250.0

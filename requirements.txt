@@ -1,0 +1,7 @@
+neo4j==6.4.1
+rdflib==7.6.0
+owlready2==0.51
+PyYAML==6.0.3
+pandas==3.0.5
+streamlit==1.67.0
+pytest==9.2.0

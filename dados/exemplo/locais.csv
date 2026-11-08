@@ -1,0 +1,10 @@
+codigo,nome,tipo,regiao
+L01,Loja Rio de Janeiro,Loja,Sudeste
+L02,Loja São Paulo,Loja,Sudeste
+L03,Loja Belo Horizonte,Loja,Sudeste
+L04,Loja Porto Alegre,Loja,Sul
+L05,Loja Curitiba,Loja,Sul
+L06,Loja Recife,Loja,Nordeste
+L07,Loja Salvador,Loja,Nordeste
+L08,Loja Brasília,Loja,Centro-Oeste
+CD1,Centro de Distribuição,CentroDistribuicao,Sudeste
