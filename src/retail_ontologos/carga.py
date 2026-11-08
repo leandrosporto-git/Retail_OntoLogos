@@ -7,7 +7,7 @@ Mapeamento OWL -> grafo de propriedades (documentado em docs/mapeamento_owl_neo4
 - indivíduo enumerado   -> nó com o atributo nome (ex.: (:CategoriaDiagnostico {nome: 'Ativo'}))
 
 Uso:
-    python -m fashionstockkg.carga --dados dados/exemplo
+    python -m retail_ontologos.carga --dados dados/exemplo
 """
 from __future__ import annotations
 

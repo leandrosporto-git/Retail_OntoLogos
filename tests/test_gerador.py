@@ -1,4 +1,4 @@
-from fashionstockkg.gerar_dados import gerar
+from retail_ontologos.gerar_dados import gerar
 
 
 def test_mesma_semente_gera_os_mesmos_dados():

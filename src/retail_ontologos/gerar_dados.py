@@ -4,7 +4,7 @@ Os dados são fictícios e reprodutíveis (mesma semente, mesmos dados). Servem 
 demonstrar e testar o software sem expor dados reais de nenhuma empresa.
 
 Uso:
-    python -m fashionstockkg.gerar_dados --produtos 300 --semente 42 --saida dados/exemplo
+    python -m retail_ontologos.gerar_dados --produtos 300 --semente 42 --saida dados/exemplo
 """
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Interface do FashionStockKG.
+"""Interface do Retail OntoLogos.
 
 Execute com:  streamlit run app/streamlit_app.py
 """
@@ -10,10 +10,10 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from fashionstockkg import carga, motor  # noqa: E402
-from fashionstockkg.conexao import conectar  # noqa: E402
+from retail_ontologos import carga, motor  # noqa: E402
+from retail_ontologos.conexao import conectar  # noqa: E402
 
-st.set_page_config(page_title="FashionStockKG", layout="wide")
+st.set_page_config(page_title="Retail OntoLogos", layout="wide")
 
 CATEGORIAS = ["Ativo", "Excesso", "Envelhecido", "LentoOuObsoleto", "DadosInsuficientes"]
 
@@ -28,7 +28,7 @@ def consultar(cypher: str, **params) -> pd.DataFrame:
         return pd.DataFrame(s.run(cypher, **params).data())
 
 
-st.title("FashionStockKG")
+st.title("Retail OntoLogos")
 st.caption("Diagnóstico e destinação de estoques obsoletos no varejo de moda, com regras explícitas e rastreáveis. "
            "Dados de exemplo fictícios; limites das regras ainda não validados com especialistas.")
 

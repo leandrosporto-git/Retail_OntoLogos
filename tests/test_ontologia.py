@@ -3,8 +3,8 @@ import shutil
 
 import pytest
 
-from fashionstockkg.carga import nome_relacionamento
-from fashionstockkg.ontologia import verificar_consistencia, vocabulario
+from retail_ontologos.carga import nome_relacionamento
+from retail_ontologos.ontologia import verificar_consistencia, vocabulario
 
 ATRIBUTOS_TECNICOS = {"id"}  # identificadores internos do grafo
 

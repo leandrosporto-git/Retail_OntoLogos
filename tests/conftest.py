@@ -6,9 +6,9 @@ import pytest
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / "src"))
 
-from fashionstockkg import carga, motor  # noqa: E402
-from fashionstockkg.conexao import conectar  # noqa: E402
-from fashionstockkg.gerar_dados import gerar, salvar  # noqa: E402
+from retail_ontologos import carga, motor  # noqa: E402
+from retail_ontologos.conexao import conectar  # noqa: E402
+from retail_ontologos.gerar_dados import gerar, salvar  # noqa: E402
 
 
 @pytest.fixture(scope="session")

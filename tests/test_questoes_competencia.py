@@ -1,8 +1,8 @@
 """Um teste por questão de competência (docs/questoes_competencia.md)."""
 import pytest
 
-from fashionstockkg.carga import ler_parametros
-from fashionstockkg.gerar_dados import CASOS_CONTROLE
+from retail_ontologos.carga import ler_parametros
+from retail_ontologos.gerar_dados import CASOS_CONTROLE
 
 
 def test_cq01_toda_observacao_tem_um_unico_diagnostico(consultar):

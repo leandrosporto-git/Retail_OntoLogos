@@ -11,8 +11,8 @@ from pathlib import Path
 from rdflib import Graph, OWL, RDF
 
 RAIZ = Path(__file__).resolve().parents[2]
-ARQUIVO_ONTOLOGIA = RAIZ / "ontologia" / "fashionstockkg.ttl"
-NS = "https://example.org/fashionstockkg#"
+ARQUIVO_ONTOLOGIA = RAIZ / "ontologia" / "retail_ontologos.ttl"
+NS = "https://example.org/retail-ontologos#"
 
 
 def carregar_grafo(caminho: Path = ARQUIVO_ONTOLOGIA) -> Graph:

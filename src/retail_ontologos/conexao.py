@@ -3,7 +3,7 @@
 Configure por variáveis de ambiente ou por um arquivo .env na raiz:
     NEO4J_URI=bolt://localhost:7687        (Aura: neo4j+s://xxxx.databases.neo4j.io)
     NEO4J_USER=neo4j
-    NEO4J_PASSWORD=fashionstockkg
+    NEO4J_PASSWORD=retail_ontologos
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ def conectar() -> Driver:
     _ler_env()
     uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
     usuario = os.environ.get("NEO4J_USER", "neo4j")
-    senha = os.environ.get("NEO4J_PASSWORD", "fashionstockkg")
+    senha = os.environ.get("NEO4J_PASSWORD", "retail_ontologos")
     driver = GraphDatabase.driver(uri, auth=(usuario, senha))
     driver.verify_connectivity()
     return driver

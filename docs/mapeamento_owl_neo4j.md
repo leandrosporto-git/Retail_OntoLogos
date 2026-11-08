@@ -1,10 +1,10 @@
 # Mapeamento entre a ontologia OWL e o grafo no Neo4j
 
 O Neo4j usa o modelo de grafo de propriedades, que não é uma linguagem de ontologias.
-Por isso o projeto mantém dois artefatos: a ontologia em OWL (`ontologia/fashionstockkg.ttl`),
+Por isso o projeto mantém dois artefatos: a ontologia em OWL (`ontologia/retail_ontologos.ttl`),
 que é a fonte do vocabulário e é verificada por um reasoner, e o grafo operacional no Neo4j,
 que guarda os dados e executa as regras. O mapeamento entre os dois é feito por código
-Python próprio (`src/fashionstockkg/carga.py`), sem o plugin neosemantics, para evitar
+Python próprio (`src/retail_ontologos/carga.py`), sem o plugin neosemantics, para evitar
 dependência de versões específicas do Neo4j.
 
 | Elemento OWL | Elemento no Neo4j | Exemplo |

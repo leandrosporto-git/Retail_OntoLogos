@@ -7,7 +7,7 @@ O motor cria um nó :RegraNegocio para cada regra, ligado à área de negócio, 
 que todo diagnóstico e toda recomendação apontem a regra (e a versão) que os gerou.
 
 Uso:
-    python -m fashionstockkg.motor
+    python -m retail_ontologos.motor
 """
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-# FashionStockKG
+# Retail OntoLogos
 
 Protótipo de apoio à decisão para **diagnóstico e destinação de estoques obsoletos no varejo de moda**,
 fundamentado em uma ontologia de domínio (OWL) e implementado com Neo4j.
@@ -34,7 +34,7 @@ docker compose up --build
 ```
 
 Abra a interface em http://localhost:8501. O navegador do Neo4j fica em http://localhost:7474
-(usuário `neo4j`, senha `fashionstockkg`).
+(usuário `neo4j`, senha `retail_ontologos`).
 
 ### Opção B: Python local + Neo4j Aura (sem instalar banco de dados)
 
@@ -45,9 +45,9 @@ Abra a interface em http://localhost:8501. O navegador do Neo4j fica em http://l
 ```bash
 pip install -r requirements.txt
 export PYTHONPATH=src                       # no Windows (PowerShell): $env:PYTHONPATH="src"
-python -m fashionstockkg.gerar_dados        # gera dados/exemplo/*.csv (opcional: já vêm no repositório)
-python -m fashionstockkg.carga              # carrega o grafo (apaga o conteúdo anterior)
-python -m fashionstockkg.motor              # roda as regras
+python -m retail_ontologos.gerar_dados        # gera dados/exemplo/*.csv (opcional: já vêm no repositório)
+python -m retail_ontologos.carga              # carrega o grafo (apaga o conteúdo anterior)
+python -m retail_ontologos.motor              # roda as regras
 streamlit run app/streamlit_app.py
 ```
 
@@ -68,7 +68,7 @@ entre o grafo e a ontologia. Sem Neo4j disponível, os testes que dependem do ba
 | `ontologia/` | Ontologia OWL em Turtle (abre no [Protégé](https://protege.stanford.edu/)) |
 | `regras/` | Regras em Cypher, uma consulta por regra, e `parametros.yaml` com limites e taxa de custo de capital |
 | `dados/exemplo/` | Dataset sintético (semente 42) |
-| `src/fashionstockkg/` | Gerador de dados, carga, motor de regras, leitura da ontologia |
+| `src/retail_ontologos/` | Gerador de dados, carga, motor de regras, leitura da ontologia |
 | `app/` | Interface Streamlit |
 | `tests/` | Testes automatizados |
 | `docs/` | Questões de competência e mapeamento OWL → Neo4j |
@@ -77,7 +77,7 @@ entre o grafo e a ontologia. Sem Neo4j disponível, os testes que dependem do ba
 
 1. Ajuste os limites em `regras/parametros.yaml` ou a consulta no arquivo `.cypher` correspondente.
 2. Suba a versão no cabeçalho da regra (`// regra: R01 | versao: 0.2.0 | ...`).
-3. Rode `python -m fashionstockkg.motor` e `python -m pytest`.
+3. Rode `python -m retail_ontologos.motor` e `python -m pytest`.
 
 ## Licença
 

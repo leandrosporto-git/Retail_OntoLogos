@@ -1,4 +1,4 @@
-@prefix :     <https://example.org/fashionstockkg#> .
+@prefix :     <https://example.org/retail-ontologos#> .
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -6,14 +6,14 @@
 @prefix dct:  <http://purl.org/dc/terms/> .
 
 # ---------------------------------------------------------------------------
-# FashionStockKG: ontologia de diagnóstico e destinação de estoques obsoletos
+# Retail OntoLogos: ontologia de diagnóstico e destinação de estoques obsoletos
 # no varejo de moda. Versão 0 (rascunho para revisão no Protégé).
 # O IRI base é provisório.
 # ---------------------------------------------------------------------------
 
-<https://example.org/fashionstockkg> a owl:Ontology ;
+<https://example.org/retail-ontologos> a owl:Ontology ;
     owl:versionInfo "0.1.0" ;
-    dct:title "FashionStockKG"@pt ;
+    dct:title "Retail OntoLogos"@pt ;
     dct:creator "Leandro Porto" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:comment "Ontologia de domínio para representar o conhecimento usado no diagnóstico e na destinação de estoques obsoletos no varejo de moda. Continua o relatório técnico MCC 06/2026 (Porto e Lifschitz)."@pt .
