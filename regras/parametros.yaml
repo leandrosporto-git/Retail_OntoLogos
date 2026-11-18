@@ -1,41 +1,26 @@
-# Parâmetros das regras de diagnóstico e destinação.
-# ATENÇÃO: os limites abaixo são HIPOTÉTICOS. Precisam ser validados com
-# especialistas antes de qualquer uso real. Mudou um limite? Suba a versão.
-versao_regras: "0.1.0"
+# Parâmetros das regras de diagnóstico e destinação (V_Zero, validada em 17/11/2026).
+# Os limites seguem o documento de definições validado com o especialista de domínio.
+# Mudou um limite? Suba a versão das regras.
+versao_regras: "0.2.0"
+
+data_referencia: "2026-10-31"          # data da foto de estoque avaliada
+inicio_historico_vendas: "2024-01-01"  # início da janela de vendas disponível
+
+escopo:
+  codigo: OUTLET
+  nome: "Rede outlet"
+  fachada: OUT            # o escopo inclui as filiais que operam sob esta fachada
 
 limites:
-  idade_estoque_dias: 180     # acima disto o estoque é considerado antigo (C01)
-  cobertura_dias: 90          # acima disto o estoque dura mais que o desejado (C02)
+  idade_meses: 24         # "mais de 24 meses" desde o lançamento (meses de calendário, estrito)
+  dias_sem_venda: 180     # "mais de 180 dias" sem venda válida na rede (estrito)
+  meses_filial_nova: 12   # filial com até 12 meses de abertura é nova (critério SSS)
+
+venda_valida:
+  tipos: [venda]          # cancelamento e devolução não contam como venda válida (definição pendente)
 
 financeiro:
-  taxa_custo_capital_anual: 0.15   # custo de capital usado no custo de oportunidade (CQ08)
+  taxa_custo_capital_anual: 0.15   # custo de capital usado no custo de oportunidade (proposta original)
 
-criterios:
-  - id: C01
-    descricao: "Idade do estoque acima do limite"
-    indicador: IdadeEstoque
-    operador: ">"
-    limite_param: idade_estoque_dias
-  - id: C02
-    descricao: "Cobertura acima do limite ou nenhuma venda registrada no período"
-    indicador: CoberturaDias
-    operador: ">"
-    limite_param: cobertura_dias
-  - id: C03
-    descricao: "Produto de coleção encerrada"
-    indicador: null
-    operador: "="
-    limite_param: null
-  - id: C04
-    descricao: "Vendas ou idade sem registro: diagnóstico não pode ser feito"
-    indicador: null
-    operador: "ausente"
-    limite_param: null
-
-causas_provaveis:
-  - codigo: ColecaoEncerrada
-    nome: "Coleção encerrada"
-  - codigo: BaixaDemanda
-    nome: "Demanda abaixo da quantidade em estoque"
-  - codigo: EstoqueEnvelhecido
-    nome: "Estoque parado há muito tempo"
+destinacao:
+  percentual_baixa_marca_descontinuada: 100

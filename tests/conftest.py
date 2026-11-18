@@ -19,7 +19,7 @@ def driver(tmp_path_factory):
     except Exception as erro:  # Neo4j fora do ar
         pytest.skip(f"Neo4j indisponível: {erro}")
     pasta = tmp_path_factory.mktemp("dados")
-    salvar(gerar(300, 42), pasta)
+    salvar(gerar(120, 42), pasta)
     carga.carregar_tudo(pasta)
     motor.executar(verbose=False)
     yield d

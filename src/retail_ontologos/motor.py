@@ -1,10 +1,10 @@
 """Motor de regras: executa os arquivos .cypher da pasta regras/, em ordem.
 
 Cada consulta começa com um cabeçalho que identifica a regra:
-    // regra: R01 | versao: 0.1.0 | area: Planejamento
+    // regra: R01 | versao: 0.2.0 | area: Planejamento
     // descricao: ...
-O motor cria um nó :RegraNegocio para cada regra, ligado à área de negócio, de modo
-que todo diagnóstico e toda recomendação apontem a regra (e a versão) que os gerou.
+O motor cria um nó :RegraNegocio para cada regra, com a versão e a área responsável,
+de modo que todo diagnóstico, motivo e recomendação apontem a regra (e a versão) que os gerou.
 
 Uso:
     python -m retail_ontologos.motor
@@ -49,19 +49,30 @@ def ler_consultas(pasta: Path = PASTA_REGRAS) -> list[Consulta]:
 
 def limpar_resultados(sessao) -> None:
     """Apaga resultados de execuções anteriores, mantendo os dados de entrada."""
-    sessao.run("MATCH (n) WHERE n:Diagnostico OR n:Evidencia OR n:Recomendacao OR n:RegraNegocio DETACH DELETE n")
-    sessao.run("""MATCH (i:Indicador)-[:DO_TIPO]->(t:TipoIndicador)
-                  WHERE t.nome IN ['CoberturaDias', 'SellThrough', 'CustoOportunidade']
-                  DETACH DELETE i""")
+    sessao.run("""MATCH (n) WHERE n:PosicaoRede OR n:Diagnostico OR n:Evidencia OR n:Motivo OR n:Recomendacao
+                  OR n:RegraNegocio OR n:EscopoRede
+                  CALL (n) { DETACH DELETE n } IN TRANSACTIONS OF 5000 ROWS""")
+    sessao.run("MATCH (:PosicaoEstoque)-[t:TEM_CONDICAO]->() DELETE t")
+    sessao.run("MATCH (p:PosicaoEstoque) WHERE p.alertaConsistencia IS NOT NULL REMOVE p.alertaConsistencia")
 
 
-def executar(data_avaliacao: date | None = None, verbose: bool = True) -> list[dict]:
-    parametros = ler_parametros()
-    args = {
+def argumentos(parametros: dict, data_referencia: date | None = None) -> dict:
+    """Parâmetros do parametros.yaml no formato esperado pelas consultas Cypher."""
+    return {
         **parametros["limites"],
         **parametros["financeiro"],
-        "data_avaliacao": (data_avaliacao or date(2026, 10, 31)).isoformat(),
+        **parametros["destinacao"],
+        "data_referencia": (data_referencia.isoformat() if data_referencia else parametros["data_referencia"]),
+        "inicio_historico_vendas": parametros["inicio_historico_vendas"],
+        "tipos_venda_valida": parametros["venda_valida"]["tipos"],
+        "escopo_codigo": parametros["escopo"]["codigo"],
+        "escopo_nome": parametros["escopo"]["nome"],
+        "escopo_fachada": parametros["escopo"]["fachada"],
     }
+
+
+def executar(data_referencia: date | None = None, verbose: bool = True) -> list[dict]:
+    args = argumentos(ler_parametros(), data_referencia)
     consultas = ler_consultas()
     resultados = []
     with conectar() as driver, driver.session() as sessao:
@@ -69,9 +80,7 @@ def executar(data_avaliacao: date | None = None, verbose: bool = True) -> list[d
         for c in {c.regra: c for c in consultas}.values():
             sessao.run("""
                 MERGE (r:RegraNegocio {id: $id})
-                SET r.versao = $versao, r.descricao = $descricao, r.arquivo = $arquivo
-                WITH r MATCH (a:AreaNegocio {nome: $area})
-                MERGE (r)-[:PERSPECTIVA_DE]->(a)""",
+                SET r.versao = $versao, r.descricao = $descricao, r.arquivo = $arquivo, r.areaResponsavel = $area""",
                        id=c.regra, versao=c.versao, descricao=c.descricao, arquivo=c.arquivo, area=c.area)
         for c in consultas:
             linhas = sessao.run(c.cypher, **args).data()
