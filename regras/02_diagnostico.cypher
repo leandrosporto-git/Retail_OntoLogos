@@ -1,58 +1,39 @@
-// regra: R01 | versao: 0.1.0 | area: Planejamento
-// descricao: Classifica cada observação de estoque em uma das categorias (idade x cobertura) e registra as evidências e causas prováveis. Sem registro de vendas ou de idade, o diagnóstico é Dados insuficientes: ausência de registro não é tratada como ausência de venda.
-MATCH (r:RegraNegocio {id: 'R01'})
-MATCH (c1:CriterioDiagnostico {id: 'C01'}), (c2:CriterioDiagnostico {id: 'C02'}),
-      (c3:CriterioDiagnostico {id: 'C03'}), (c4:CriterioDiagnostico {id: 'C04'})
-MATCH (kCol:CausaProvavel {codigo: 'ColecaoEncerrada'}), (kDem:CausaProvavel {codigo: 'BaixaDemanda'}),
-      (kIda:CausaProvavel {codigo: 'EstoqueEnvelhecido'})
-MATCH (p:Produto)-[:POSSUI_OBSERVACAO]->(o:ObservacaoEstoque)
-MATCH (p)-[:PERTENCE_A_COLECAO]->(col:Colecao)
-OPTIONAL MATCH (o)-[:POSSUI_INDICADOR]->(iIdade:Indicador)-[:DO_TIPO]->(:TipoIndicador {nome: 'IdadeEstoque'})
-OPTIONAL MATCH (o)-[:POSSUI_INDICADOR]->(iVend:Indicador)-[:DO_TIPO]->(:TipoIndicador {nome: 'VendasPeriodo'})
-OPTIONAL MATCH (o)-[:POSSUI_INDICADOR]->(iCob:Indicador)-[:DO_TIPO]->(:TipoIndicador {nome: 'CoberturaDias'})
-WITH r, c1, c2, c3, c4, kCol, kDem, kIda, o, col, iIdade, iVend, iCob,
-     (iIdade IS NULL OR iVend IS NULL) AS faltaDado
-WITH r, c1, c2, c3, c4, kCol, kDem, kIda, o, col, iIdade, iVend, iCob, faltaDado,
-     (NOT faltaDado AND iIdade.valor > $idade_estoque_dias) AS atendeC01,
-     (NOT faltaDado AND (iVend.valor = 0 OR iCob.valor > $cobertura_dias)) AS atendeC02
-WITH *, CASE
-          WHEN faltaDado THEN 'DadosInsuficientes'
-          WHEN atendeC01 AND atendeC02 THEN 'LentoOuObsoleto'
-          WHEN atendeC01 THEN 'Envelhecido'
-          WHEN atendeC02 THEN 'Excesso'
-          ELSE 'Ativo'
-        END AS categoria
-MATCH (cat:CategoriaDiagnostico {nome: categoria})
-CREATE (o)-[:RECEBE_DIAGNOSTICO]->(d:Diagnostico {id: o.id + '-R01', dataAvaliacao: datetime($data_avaliacao), versao: r.versao})
-CREATE (d)-[:CLASSIFICADO_COMO]->(cat)
-CREATE (d)-[:GERADO_POR_REGRA]->(r)
-FOREACH (_ IN CASE WHEN atendeC01 THEN [1] ELSE [] END |
-  CREATE (d)-[:FUNDAMENTADO_EM]->(e:Evidencia {id: d.id + '-C01', valorObservado: iIdade.valor,
-          justificativa: 'Idade do estoque de ' + toString(iIdade.valor) + ' dias, acima do limite de ' + toString($idade_estoque_dias) + ' dias'})
-  CREATE (e)-[:ATENDE_CRITERIO]->(c1)
-  CREATE (e)-[:BASEADA_EM_INDICADOR]->(iIdade)
-  CREATE (e)-[:INDICA_CAUSA]->(kIda))
-FOREACH (_ IN CASE WHEN atendeC02 AND iVend.valor = 0 THEN [1] ELSE [] END |
-  CREATE (d)-[:FUNDAMENTADO_EM]->(e:Evidencia {id: d.id + '-C02', valorObservado: 0,
-          justificativa: 'Nenhuma venda registrada nos últimos 90 dias'})
-  CREATE (e)-[:ATENDE_CRITERIO]->(c2)
-  CREATE (e)-[:BASEADA_EM_INDICADOR]->(iVend)
-  CREATE (e)-[:INDICA_CAUSA]->(kDem))
-FOREACH (_ IN CASE WHEN atendeC02 AND iVend.valor > 0 THEN [1] ELSE [] END |
-  CREATE (d)-[:FUNDAMENTADO_EM]->(e:Evidencia {id: d.id + '-C02', valorObservado: iCob.valor,
-          justificativa: 'Cobertura de ' + toString(iCob.valor) + ' dias, acima do limite de ' + toString($cobertura_dias) + ' dias'})
-  CREATE (e)-[:ATENDE_CRITERIO]->(c2)
-  CREATE (e)-[:BASEADA_EM_INDICADOR]->(iCob)
-  CREATE (e)-[:INDICA_CAUSA]->(kDem))
-FOREACH (_ IN CASE WHEN col.encerrada AND categoria IN ['Excesso', 'Envelhecido', 'LentoOuObsoleto'] THEN [1] ELSE [] END |
-  CREATE (d)-[:FUNDAMENTADO_EM]->(e:Evidencia {id: d.id + '-C03',
-          justificativa: 'Produto da coleção ' + col.nome + ', já encerrada'})
-  CREATE (e)-[:ATENDE_CRITERIO]->(c3)
-  CREATE (e)-[:INDICA_CAUSA]->(kCol))
-FOREACH (_ IN CASE WHEN faltaDado THEN [1] ELSE [] END |
-  CREATE (d)-[:FUNDAMENTADO_EM]->(e:Evidencia {id: d.id + '-C04',
-          justificativa: 'Sem registro de: ' + CASE WHEN iVend IS NULL AND iIdade IS NULL THEN 'vendas e idade do estoque'
-                                                   WHEN iVend IS NULL THEN 'vendas no período'
-                                                   ELSE 'idade do estoque' END})
-  CREATE (e)-[:ATENDE_CRITERIO]->(c4))
-RETURN categoria, count(*) AS observacoes ORDER BY categoria;
+// regra: R01 | versao: 0.2.0 | area: Planejamento
+// descricao: Classifica cada posição na rede com saldo positivo pelo fluxograma de giro e idade: dados insuficientes -> Diagnóstico pendente; senão cruza mais de 180 dias sem venda válida na rede com mais de 24 meses desde o lançamento (limites estritos, meses de calendário). Saldo zero ou negativo fica fora do universo.
+MATCH (regra:RegraNegocio {id: 'R01'})
+MATCH (r:PosicaoRede)-[:REFERE_SE_A]->(pc:ProdutoCor)
+WHERE r.saldoRede > 0
+WITH regra, r, pc,
+     (pc.dataLancamento IS NULL OR date($inicio_historico_vendas) > r.dataReferencia - duration({days: $dias_sem_venda})) AS pendente
+WITH regra, r, pc, pendente,
+     (NOT pendente AND r.diasSemVenda > $dias_sem_venda) AS semGiro,
+     (NOT pendente AND r.dataReferencia > pc.dataLancamento + duration({months: $idade_meses})) AS antigo
+WITH regra, r, pc, pendente, semGiro, antigo,
+     CASE WHEN pendente THEN 'DiagnosticoPendente'
+          WHEN NOT semGiro AND NOT antigo THEN 'Ativo'
+          WHEN NOT semGiro THEN 'AntigoComGiro'
+          WHEN NOT antigo THEN 'SemGiroEmAtencao'
+          ELSE 'PotencialmenteObsoleto' END AS situacao
+MATCH (s:SituacaoGiroIdade {nome: situacao})
+CREATE (r)-[:RECEBE_DIAGNOSTICO]->(d:Diagnostico {id: r.id + '-R01', dataAvaliacao: r.dataReferencia, versao: regra.versao})
+CREATE (d)-[:CLASSIFICADO_COMO]->(s)
+CREATE (d)-[:GERADO_POR_REGRA]->(regra)
+CREATE (d)-[:SUSTENTADO_POR]->(:Evidencia {id: d.id + '-C01', criterio: 'C01 saldo consolidado positivo',
+        valorObservado: r.saldoRede, limite: 0,
+        justificativa: 'Saldo de ' + toString(r.saldoRede) + ' peças nas filiais do escopo em ' + toString(r.dataReferencia)})
+FOREACH (_ IN CASE WHEN pendente THEN [1] ELSE [] END |
+  CREATE (d)-[:SUSTENTADO_POR]->(:Evidencia {id: d.id + '-C04', criterio: 'C04 dados suficientes',
+          justificativa: CASE WHEN pc.dataLancamento IS NULL THEN 'Sem data de lançamento confiável: completar evidências'
+                              ELSE 'Janela de vendas não cobre os últimos ' + toString($dias_sem_venda) + ' dias' END}))
+FOREACH (_ IN CASE WHEN pendente THEN [] ELSE [1] END |
+  CREATE (d)-[:SUSTENTADO_POR]->(:Evidencia {id: d.id + '-C02', criterio: 'C02 dias sem venda válida na rede',
+          valorObservado: r.diasSemVenda, limite: $dias_sem_venda,
+          justificativa: CASE WHEN r.ultimaVendaValida IS NULL
+                              THEN 'Nenhuma venda válida na rede na janela disponível: ' + toString(r.diasSemVenda) + ' dias'
+                              ELSE 'Última venda válida na rede em ' + toString(r.ultimaVendaValida) + ': ' + toString(r.diasSemVenda) + ' dias' END
+                         + CASE WHEN semGiro THEN ' (mais de ' ELSE ' (até ' END + toString($dias_sem_venda) + ' dias)'})
+  CREATE (d)-[:SUSTENTADO_POR]->(:Evidencia {id: d.id + '-C03', criterio: 'C03 meses desde o lançamento',
+          valorObservado: r.idadeMeses, limite: $idade_meses,
+          justificativa: 'Lançado em ' + toString(pc.dataLancamento) + ' (' + coalesce(pc.origemDataLancamento, 'origem não informada') + '): '
+                         + toString(r.idadeMeses) + ' meses' + CASE WHEN antigo THEN ' (mais de ' ELSE ' (até ' END + toString($idade_meses) + ' meses)'}))
+RETURN situacao, count(*) AS posicoes ORDER BY situacao;

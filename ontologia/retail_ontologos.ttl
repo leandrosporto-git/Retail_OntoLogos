@@ -7,232 +7,406 @@
 
 # ---------------------------------------------------------------------------
 # Retail OntoLogos: ontologia de diagnóstico e destinação de estoques obsoletos
-# no varejo de moda. Versão 0 (rascunho para revisão no Protégé).
+# no varejo de moda. Versão V_Zero (0.2.0), validada com o especialista de
+# domínio em 17/11/2026 a partir das definições de uma rede de outlets de moda.
 # O IRI base é provisório.
+#
+# Organização (16 classes em 4 dimensões):
+#   Característica ............ Marca, Colecao, Produto, ProdutoCor, SKU
+#   Localidade e tempo ........ Filial, EscopoRede, ClassificacaoVigencia
+#   Fatos numa data ........... PosicaoEstoque, PosicaoRede, Venda
+#   Diagnóstico e destinação .. Diagnostico, Evidencia, RegraNegocio, Motivo, Recomendacao
+# Listas de valores (classes enumeradas): SituacaoGiroIdade, CondicaoComercial,
+#   FaseColecao, TipoColecao, TipoRestricao, Canal, TipoFilial, TipoMotivo, AcaoDestinacao.
+#
+# As regras de diagnóstico ficam FORA do OWL (em Cypher, pasta regras/), porque
+# "sem venda há mais de 180 dias" exige raciocínio de mundo fechado, que o OWL não faz.
 # ---------------------------------------------------------------------------
 
 <https://example.org/retail-ontologos> a owl:Ontology ;
-    owl:versionInfo "0.1.0" ;
+    owl:versionInfo "0.2.0" ;
     dct:title "Retail OntoLogos"@pt ;
     dct:creator "Leandro Porto" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    rdfs:comment "Ontologia de domínio para representar o conhecimento usado no diagnóstico e na destinação de estoques obsoletos no varejo de moda. Continua o relatório técnico MCC 06/2026 (Porto e Lifschitz)."@pt .
+    rdfs:comment "Ontologia de domínio para representar o conhecimento usado no diagnóstico e na destinação de estoques obsoletos no varejo de moda. Continua o relatório técnico MCC 06/2026 (Porto e Lifschitz). Versão V_Zero, validada com especialista a partir das definições de uma rede de outlets de moda."@pt .
 
 # ===========================================================================
-# Classes: entidades do domínio
+# Dimensão Característica
 # ===========================================================================
 
-:Produto a owl:Class ;
-    rdfs:label "Produto"@pt ;
-    rdfs:comment "Item comercial identificado por SKU."@pt .
+:Marca a owl:Class ;
+    rdfs:label "Marca"@pt ;
+    rdfs:comment "Marca do produto (nível N_0) e marca da fachada de uma filial. Pode estar vigente ou descontinuada."@pt .
 
 :Colecao a owl:Class ;
     rdfs:label "Coleção"@pt ;
-    rdfs:comment "Agrupamento comercial ou sazonal de produtos (ex.: Verão 2025)."@pt .
+    rdfs:comment "Coleção de uma marca, com as datas de início, SALE, OFF 1, OFF 2 e OFF PC. A fase vigente é calculada pela data de referência."@pt .
 
-:LocalEstoque a owl:Class ;
-    rdfs:label "Local de estoque"@pt ;
-    rdfs:comment "Unidade onde o estoque é mantido."@pt .
+:Produto a owl:Class ;
+    rdfs:label "Produto"@pt ;
+    rdfs:comment "O modelo (nível N_5). Negócio, linha, grupo e subgrupo (N_1 a N_4) são atributos, não classes, porque nenhuma regra depende deles na V_Zero."@pt .
 
-:Loja a owl:Class ;
-    rdfs:subClassOf :LocalEstoque ;
-    rdfs:label "Loja"@pt .
+:ProdutoCor a owl:Class ;
+    rdfs:label "Produto-cor"@pt ;
+    rdfs:comment "O produto numa cor (nível N_6). É a chave primária e a unidade do diagnóstico."@pt .
 
-:CentroDistribuicao a owl:Class ;
-    rdfs:subClassOf :LocalEstoque ;
-    rdfs:label "Centro de distribuição"@pt .
-
-:ObservacaoEstoque a owl:Class ;
-    rdfs:label "Observação de estoque"@pt ;
-    rdfs:comment "Situação do estoque de um produto em um local e uma data. O diagnóstico é atribuído à observação, e não ao produto, porque a obsolescência depende do contexto (loja e período)."@pt .
+:SKU a owl:Class ;
+    rdfs:label "SKU"@pt ;
+    rdfs:comment "Produto-cor + tamanho (nível N_7), dentro de uma grade. Usado no detalhamento."@pt .
 
 # ===========================================================================
-# Classes: conhecimento usado na decisão
+# Dimensão Localidade e classificações no tempo
 # ===========================================================================
 
-:Indicador a owl:Class ;
-    rdfs:label "Indicador"@pt ;
-    rdfs:comment "Medida usada para avaliar a situação comercial de uma observação de estoque."@pt .
+:Filial a owl:Class ;
+    rdfs:label "Filial"@pt ;
+    rdfs:comment "Local de estoque com código estável. O nome atual é o rótulo preferido; os nomes anteriores (reorganizações societárias) são rótulos alternativos."@pt .
 
-:TipoIndicador a owl:Class ;
-    rdfs:label "Tipo de indicador"@pt ;
-    owl:oneOf ( :IdadeEstoque :VendasPeriodo :CoberturaDias :SellThrough :CustoOportunidade ) .
+:EscopoRede a owl:Class ;
+    rdfs:label "Escopo de rede"@pt ;
+    rdfs:comment "Conjunto de filiais em que o giro é avaliado. O escopo da rede outlet é calculado: são as filiais que operam sob a fachada da marca da rede."@pt .
 
-:CriterioDiagnostico a owl:Class ;
-    rdfs:label "Critério de diagnóstico"@pt ;
-    rdfs:comment "Condição explícita, com limite e versão, usada para interpretar um indicador."@pt .
+:ClassificacaoVigencia a owl:Class ;
+    rdfs:label "Classificação com vigência"@pt ;
+    rdfs:comment "Um valor de classificação válido entre duas datas (regra com log temporal). Usada para o tipo de coleção do produto-cor e para o bloqueio de envio a uma filial."@pt .
 
-:Evidencia a owl:Class ;
-    rdfs:label "Evidência"@pt ;
-    rdfs:comment "Fato observado que atende a um critério e fundamenta um diagnóstico."@pt .
+# ===========================================================================
+# Dimensão Fatos numa data de referência
+# ===========================================================================
 
-:CausaProvavel a owl:Class ;
-    rdfs:label "Causa provável"@pt ;
-    rdfs:comment "Fator de negócio associado à obsolescência (ex.: coleção encerrada)."@pt .
+:PosicaoEstoque a owl:Class ;
+    rdfs:label "Posição de estoque"@pt ;
+    rdfs:comment "Quantidade de um produto-cor numa filial numa data (uma foto por data)."@pt .
 
-:CategoriaDiagnostico a owl:Class ;
-    rdfs:label "Categoria de diagnóstico"@pt ;
-    rdfs:comment "Classificação de idade e demanda do estoque, conforme a Figura 1 do relatório técnico, mais o estado Dados insuficientes."@pt ;
-    owl:oneOf ( :Ativo :Excesso :Envelhecido :LentoOuObsoleto :DadosInsuficientes ) .
+:PosicaoRede a owl:Class ;
+    rdfs:label "Posição na rede"@pt ;
+    rdfs:comment "Soma das posições de um produto-cor nas filiais de um escopo, na mesma data. É onde o diagnóstico acontece."@pt .
+
+:Venda a owl:Class ;
+    rdfs:label "Venda"@pt ;
+    rdfs:comment "Movimento de venda de um produto-cor numa filial numa data, com o tipo (venda, cancelamento, devolução). A venda válida é filtrada pelos tipos definidos nos parâmetros."@pt .
+
+# ===========================================================================
+# Dimensão Diagnóstico e destinação
+# ===========================================================================
 
 :Diagnostico a owl:Class ;
     rdfs:label "Diagnóstico"@pt ;
-    rdfs:comment "Resultado da avaliação de uma observação de estoque por uma regra versionada."@pt .
+    rdfs:comment "Situação de giro e idade de uma posição na rede, gerada por uma regra versionada."@pt .
 
-:AcaoDestinacao a owl:Class ;
-    rdfs:label "Ação de destinação"@pt ;
-    owl:oneOf ( :Remarcacao :TransferenciaEntreLojas :Liquidacao :CanalAlternativo :Doacao :BaixaContabil ) .
-
-:Recomendacao a owl:Class ;
-    rdfs:label "Recomendação"@pt ;
-    rdfs:comment "Sugestão de ação de destinação para um diagnóstico, justificada por uma regra."@pt .
+:Evidencia a owl:Class ;
+    rdfs:label "Evidência"@pt ;
+    rdfs:comment "Valor observado que sustenta um diagnóstico ou um motivo, com o critério atendido e a justificativa."@pt .
 
 :RegraNegocio a owl:Class ;
     rdfs:label "Regra de negócio"@pt ;
-    rdfs:comment "Regra explícita e versionada. Implementada em Cypher (arquivos em regras/), porque depende de agregações e de raciocínio de mundo fechado."@pt .
+    rdfs:comment "Regra explícita e versionada, executada fora do OWL (Cypher)."@pt .
 
-:AreaNegocio a owl:Class ;
-    rdfs:label "Área de negócio"@pt ;
-    owl:oneOf ( :Planejamento :Compras :Merchandising :Comercial :Operacoes ) .
+:Motivo a owl:Class ;
+    rdfs:label "Motivo"@pt ;
+    rdfs:comment "Critério independente que pode coexistir com qualquer situação (marca descontinuada, defeito, cancelamento, oportunidade local, bloqueio, contínuo com sinal de obsolescência)."@pt .
 
-# Disjunções entre as classes de topo (uma coisa não pode ser duas delas)
+:Recomendacao a owl:Class ;
+    rdfs:label "Recomendação"@pt ;
+    rdfs:comment "Ação sugerida, com percentual, justificativa e prioridade. Decisão e execução ficam para a V1."@pt .
+
+# ===========================================================================
+# Listas de valores (classes enumeradas)
+# ===========================================================================
+
+:SituacaoGiroIdade a owl:Class ;
+    rdfs:label "Situação de giro e idade"@pt ;
+    owl:oneOf ( :Ativo :AntigoComGiro :SemGiroEmAtencao :PotencialmenteObsoleto :DiagnosticoPendente ) .
+
+:CondicaoComercial a owl:Class ;
+    rdfs:label "Condição comercial"@pt ;
+    owl:oneOf ( :ComDefeito :SemDefeito ) .
+
+:FaseColecao a owl:Class ;
+    rdfs:label "Fase da coleção"@pt ;
+    owl:oneOf ( :FaseON :FaseSALE :FaseOFF1 :FaseOFF2 :FaseOFFPC ) .
+
+:ValorClassificacao a owl:Class ;
+    rdfs:label "Valor de classificação"@pt ;
+    rdfs:comment "Superclasse dos valores que uma classificação com vigência pode assumir."@pt .
+
+:TipoColecao a owl:Class ;
+    rdfs:subClassOf :ValorClassificacao ;
+    rdfs:label "Tipo de coleção"@pt ;
+    owl:oneOf ( :TipoColecaoColecao :TipoColecaoContinuo :TipoColecaoSales :TipoColecaoOff ) .
+
+:TipoRestricao a owl:Class ;
+    rdfs:subClassOf :ValorClassificacao ;
+    rdfs:label "Tipo de restrição"@pt ;
+    owl:oneOf ( :BloqueioEnvio ) .
+
+:Canal a owl:Class ;
+    rdfs:label "Canal"@pt ;
+    owl:oneOf ( :CanalAtacado :CanalEcommerce :CanalLoja ) .
+
+:TipoFilial a owl:Class ;
+    rdfs:label "Tipo de filial"@pt ;
+    owl:oneOf ( :FilialVenda :FilialEstoque :FilialDefeito ) .
+
+:TipoMotivo a owl:Class ;
+    rdfs:label "Tipo de motivo"@pt ;
+    owl:oneOf ( :MarcaDescontinuada :ProdutoComDefeito :ProdutoCancelado :OportunidadeLocal :BloqueioDeEnvio :ContinuoComSinalObsolescencia ) .
+
+:AcaoDestinacao a owl:Class ;
+    rdfs:label "Ação de destinação"@pt ;
+    owl:oneOf ( :Transferencia :Exposicao :AcaoComercial :Baixa :RecolherEnviarFilialDefeito :ManterNoCD :RevisarClassificacao ) .
+
 [] a owl:AllDisjointClasses ;
-   owl:members ( :Produto :Colecao :LocalEstoque :ObservacaoEstoque :Indicador
-                 :CriterioDiagnostico :Evidencia :CausaProvavel :Diagnostico
-                 :Recomendacao :RegraNegocio ) .
+    owl:members ( :Marca :Colecao :Produto :ProdutoCor :SKU :Filial :EscopoRede :ClassificacaoVigencia
+                  :PosicaoEstoque :PosicaoRede :Venda :Diagnostico :Evidencia :RegraNegocio :Motivo
+                  :Recomendacao :SituacaoGiroIdade :CondicaoComercial :FaseColecao :ValorClassificacao
+                  :Canal :TipoFilial :TipoMotivo :AcaoDestinacao ) .
+
+:TipoColecao owl:disjointWith :TipoRestricao .
+
+# ---- Indivíduos das listas de valores ---------------------------------------
+
+:Ativo a owl:NamedIndividual, :SituacaoGiroIdade ;
+    rdfs:label "Ativo"@pt ;
+    rdfs:comment "Venda válida na rede nos últimos 180 dias e até 24 meses desde o lançamento."@pt .
+:AntigoComGiro a owl:NamedIndividual, :SituacaoGiroIdade ;
+    rdfs:label "Antigo com giro"@pt ;
+    rdfs:comment "Venda válida na rede nos últimos 180 dias e mais de 24 meses desde o lançamento."@pt .
+:SemGiroEmAtencao a owl:NamedIndividual, :SituacaoGiroIdade ;
+    rdfs:label "Sem giro em atenção"@pt ;
+    rdfs:comment "Mais de 180 dias sem venda válida na rede e até 24 meses desde o lançamento."@pt .
+:PotencialmenteObsoleto a owl:NamedIndividual, :SituacaoGiroIdade ;
+    rdfs:label "Potencialmente obsoleto"@pt ;
+    rdfs:comment "Saldo positivo, mais de 180 dias sem venda válida na rede e mais de 24 meses desde o lançamento."@pt .
+:DiagnosticoPendente a owl:NamedIndividual, :SituacaoGiroIdade ;
+    rdfs:label "Diagnóstico pendente"@pt ;
+    rdfs:comment "Falta data de lançamento confiável ou a janela de vendas não está completa."@pt .
+
+:ComDefeito a owl:NamedIndividual, :CondicaoComercial ; rdfs:label "Com defeito (baixo valor comercial)"@pt .
+:SemDefeito a owl:NamedIndividual, :CondicaoComercial ; rdfs:label "Sem defeito (com valor comercial)"@pt .
+
+:FaseON a owl:NamedIndividual, :FaseColecao ; rdfs:label "ON"@pt .
+:FaseSALE a owl:NamedIndividual, :FaseColecao ; rdfs:label "SALE"@pt .
+:FaseOFF1 a owl:NamedIndividual, :FaseColecao ; rdfs:label "OFF 1"@pt .
+:FaseOFF2 a owl:NamedIndividual, :FaseColecao ; rdfs:label "OFF 2"@pt .
+:FaseOFFPC a owl:NamedIndividual, :FaseColecao ; rdfs:label "OFF PC"@pt .
+
+:TipoColecaoColecao a owl:NamedIndividual, :TipoColecao ; rdfs:label "Coleção"@pt .
+:TipoColecaoContinuo a owl:NamedIndividual, :TipoColecao ; rdfs:label "Contínuo"@pt .
+:TipoColecaoSales a owl:NamedIndividual, :TipoColecao ; rdfs:label "Sales"@pt .
+:TipoColecaoOff a owl:NamedIndividual, :TipoColecao ; rdfs:label "Off"@pt .
+
+:BloqueioEnvio a owl:NamedIndividual, :TipoRestricao ;
+    rdfs:label "Envio bloqueado"@pt ;
+    rdfs:comment "Destino impossibilitado de receber o produto-cor, de qualquer origem; pode ser temporário."@pt .
+
+:CanalAtacado a owl:NamedIndividual, :Canal ; rdfs:label "Atacado"@pt .
+:CanalEcommerce a owl:NamedIndividual, :Canal ; rdfs:label "E-commerce"@pt .
+:CanalLoja a owl:NamedIndividual, :Canal ; rdfs:label "Loja"@pt .
+
+:FilialVenda a owl:NamedIndividual, :TipoFilial ; rdfs:label "Filial de venda"@pt .
+:FilialEstoque a owl:NamedIndividual, :TipoFilial ; rdfs:label "Filial de estoque"@pt .
+:FilialDefeito a owl:NamedIndividual, :TipoFilial ;
+    rdfs:label "Filial de defeito"@pt ;
+    rdfs:comment "Hipótese simplificadora validada em 17/11/2026: toda peça em filial de defeito é tratada como com defeito."@pt .
+
+:MarcaDescontinuada a owl:NamedIndividual, :TipoMotivo ; rdfs:label "Marca descontinuada"@pt .
+:ProdutoComDefeito a owl:NamedIndividual, :TipoMotivo ; rdfs:label "Produto com defeito"@pt .
+:ProdutoCancelado a owl:NamedIndividual, :TipoMotivo ; rdfs:label "Produto cancelado pelo estilo"@pt .
+:OportunidadeLocal a owl:NamedIndividual, :TipoMotivo ; rdfs:label "Oportunidade local"@pt .
+:BloqueioDeEnvio a owl:NamedIndividual, :TipoMotivo ;
+    rdfs:label "Bloqueio de envio"@pt ;
+    rdfs:comment "Quando a situação é sem giro, o bloqueio é registrado como causa provável da falta de venda."@pt .
+:ContinuoComSinalObsolescencia a owl:NamedIndividual, :TipoMotivo ; rdfs:label "Contínuo com sinal de obsolescência"@pt .
+
+:Transferencia a owl:NamedIndividual, :AcaoDestinacao ; rdfs:label "Transferência ou redistribuição"@pt .
+:Exposicao a owl:NamedIndividual, :AcaoDestinacao ; rdfs:label "Exposição"@pt .
+:AcaoComercial a owl:NamedIndividual, :AcaoDestinacao ; rdfs:label "Ação comercial"@pt .
+:Baixa a owl:NamedIndividual, :AcaoDestinacao ; rdfs:label "Baixa (write-off)"@pt .
+:RecolherEnviarFilialDefeito a owl:NamedIndividual, :AcaoDestinacao ;
+    rdfs:label "Recolher ao CD e enviar à filial de defeito que vende"@pt ;
+    rdfs:comment "Destino do produto cancelado pelo estilo: a única filial autorizada a vender esse tipo de produto."@pt .
+:ManterNoCD a owl:NamedIndividual, :AcaoDestinacao ; rdfs:label "Manter no CD"@pt .
+:RevisarClassificacao a owl:NamedIndividual, :AcaoDestinacao ; rdfs:label "Revisar classificação e avaliar descontinuação"@pt .
 
 # ===========================================================================
-# Indivíduos enumerados
+# Propriedades de objeto
 # ===========================================================================
 
-:IdadeEstoque a :TipoIndicador ; rdfs:label "Idade do estoque (dias)"@pt .
-:VendasPeriodo a :TipoIndicador ; rdfs:label "Vendas nos últimos 90 dias (unidades)"@pt .
-:CoberturaDias a :TipoIndicador ; rdfs:label "Cobertura (dias)"@pt .
-:SellThrough a :TipoIndicador ; rdfs:label "Sell-through 90 dias"@pt .
-:CustoOportunidade a :TipoIndicador ; rdfs:label "Custo de oportunidade (R$)"@pt .
+:pertenceAMarca a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "pertence a"@pt ; rdfs:domain :Produto ; rdfs:range :Marca .
 
-:Ativo a :CategoriaDiagnostico ; rdfs:label "Ativo"@pt .
-:Excesso a :CategoriaDiagnostico ; rdfs:label "Excesso"@pt .
-:Envelhecido a :CategoriaDiagnostico ; rdfs:label "Envelhecido"@pt .
-:LentoOuObsoleto a :CategoriaDiagnostico ; rdfs:label "Lento ou obsoleto"@pt .
-:DadosInsuficientes a :CategoriaDiagnostico ; rdfs:label "Dados insuficientes"@pt .
+:operaSobFachada a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "opera sob a fachada de"@pt ; rdfs:domain :Filial ; rdfs:range :Marca .
 
-:Remarcacao a :AcaoDestinacao ; rdfs:label "Remarcação"@pt .
-:TransferenciaEntreLojas a :AcaoDestinacao ; rdfs:label "Transferência entre lojas"@pt .
-:Liquidacao a :AcaoDestinacao ; rdfs:label "Liquidação"@pt .
-:CanalAlternativo a :AcaoDestinacao ; rdfs:label "Venda em canal alternativo"@pt .
-:Doacao a :AcaoDestinacao ; rdfs:label "Doação"@pt .
-:BaixaContabil a :AcaoDestinacao ; rdfs:label "Baixa contábil"@pt .
+:colecaoDaMarca a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "é coleção da marca"@pt ; rdfs:domain :Colecao ; rdfs:range :Marca .
 
-:Planejamento a :AreaNegocio ; rdfs:label "Planejamento"@pt .
-:Compras a :AreaNegocio ; rdfs:label "Compras"@pt .
-:Merchandising a :AreaNegocio ; rdfs:label "Merchandising"@pt .
-:Comercial a :AreaNegocio ; rdfs:label "Comercial"@pt .
-:Operacoes a :AreaNegocio ; rdfs:label "Operações"@pt .
+:variacaoDe a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "é variante de"@pt ; rdfs:domain :ProdutoCor ; rdfs:range :Produto .
 
-:Ativo owl:differentFrom :Excesso , :Envelhecido , :LentoOuObsoleto , :DadosInsuficientes .
-:Excesso owl:differentFrom :Envelhecido , :LentoOuObsoleto , :DadosInsuficientes .
-:Envelhecido owl:differentFrom :LentoOuObsoleto , :DadosInsuficientes .
-:LentoOuObsoleto owl:differentFrom :DadosInsuficientes .
+:tamanhoDe a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "é tamanho de"@pt ; rdfs:domain :SKU ; rdfs:range :ProdutoCor .
 
-# ===========================================================================
-# Propriedades de objeto (viram relacionamentos no Neo4j)
-# ===========================================================================
+:temColecaoOriginal a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "tem coleção original"@pt ; rdfs:domain :ProdutoCor ; rdfs:range :Colecao ;
+    rdfs:comment "A idade é contada pela coleção original e pela data de lançamento."@pt .
 
-:pertenceAColecao a owl:ObjectProperty ;
-    rdfs:domain :Produto ; rdfs:range :Colecao ;
-    rdfs:label "pertence à coleção"@pt .
+:temColecaoAtual a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "tem coleção atual"@pt ; rdfs:domain :ProdutoCor ; rdfs:range :Colecao ;
+    rdfs:comment "Serve para recortes de consulta."@pt .
 
-:possuiObservacao a owl:ObjectProperty ;
-    rdfs:domain :Produto ; rdfs:range :ObservacaoEstoque ;
-    rdfs:label "possui observação"@pt .
+:temCanal a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "tem canal"@pt ; rdfs:domain :Filial ; rdfs:range :Canal .
 
-:observacaoDe a owl:ObjectProperty , owl:FunctionalProperty ;
-    owl:inverseOf :possuiObservacao ;
-    rdfs:label "observação de"@pt .
+:doTipoFilial a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "é do tipo"@pt ; rdfs:domain :Filial ; rdfs:range :TipoFilial .
 
-:localizadaEm a owl:ObjectProperty , owl:FunctionalProperty ;
-    rdfs:domain :ObservacaoEstoque ; rdfs:range :LocalEstoque ;
-    rdfs:label "localizada em"@pt .
+:incluiFilial a owl:ObjectProperty ;
+    rdfs:label "inclui"@pt ; rdfs:domain :EscopoRede ; rdfs:range :Filial .
 
-:possuiIndicador a owl:ObjectProperty ;
-    rdfs:domain :ObservacaoEstoque ; rdfs:range :Indicador ;
-    rdfs:label "possui indicador"@pt .
+:temClassificacao a owl:ObjectProperty ;
+    rdfs:label "tem classificação"@pt ; rdfs:domain :ProdutoCor ; rdfs:range :ClassificacaoVigencia .
 
-:doTipo a owl:ObjectProperty , owl:FunctionalProperty ;
-    rdfs:domain :Indicador ; rdfs:range :TipoIndicador ;
-    rdfs:label "do tipo"@pt .
+:temValor a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "tem valor"@pt ; rdfs:domain :ClassificacaoVigencia ; rdfs:range :ValorClassificacao .
 
-:recebeDiagnostico a owl:ObjectProperty ;
-    rdfs:domain :ObservacaoEstoque ; rdfs:range :Diagnostico ;
-    rdfs:label "recebe diagnóstico"@pt .
+:restringeDestino a owl:ObjectProperty ;
+    rdfs:label "restringe o destino"@pt ; rdfs:domain :ClassificacaoVigencia ; rdfs:range :Filial ;
+    rdfs:comment "Filial que não pode receber o produto-cor enquanto o bloqueio estiver vigente."@pt .
 
-:classificadoComo a owl:ObjectProperty , owl:FunctionalProperty ;
-    rdfs:domain :Diagnostico ; rdfs:range :CategoriaDiagnostico ;
-    rdfs:label "classificado como"@pt .
+:refereSeA a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "refere-se a"@pt ; rdfs:range :ProdutoCor ;
+    rdfs:comment "Usada por posição de estoque, posição na rede e venda."@pt .
 
-:fundamentadoEm a owl:ObjectProperty ;
-    rdfs:domain :Diagnostico ; rdfs:range :Evidencia ;
-    rdfs:label "fundamentado em"@pt .
+:estaEm a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "está em"@pt ; rdfs:domain :PosicaoEstoque ; rdfs:range :Filial .
 
-:atendeCriterio a owl:ObjectProperty , owl:FunctionalProperty ;
-    rdfs:domain :Evidencia ; rdfs:range :CriterioDiagnostico ;
-    rdfs:label "atende ao critério"@pt .
+:ocorreuEm a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "ocorreu em"@pt ; rdfs:domain :Venda ; rdfs:range :Filial .
 
-:baseadaEmIndicador a owl:ObjectProperty ;
-    rdfs:domain :Evidencia ; rdfs:range :Indicador ;
-    rdfs:label "baseada em indicador"@pt .
+:temCondicao a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "tem condição"@pt ; rdfs:domain :PosicaoEstoque ; rdfs:range :CondicaoComercial .
 
-:indicaCausa a owl:ObjectProperty ;
-    rdfs:domain :Evidencia ; rdfs:range :CausaProvavel ;
-    rdfs:label "indica causa"@pt .
+:consolida a owl:ObjectProperty ;
+    rdfs:label "consolida"@pt ; rdfs:domain :PosicaoRede ; rdfs:range :PosicaoEstoque .
 
-:geradoPorRegra a owl:ObjectProperty ;
-    rdfs:range :RegraNegocio ;
-    rdfs:label "gerado por regra"@pt ;
-    rdfs:comment "Liga um diagnóstico ou uma recomendação à regra que o produziu."@pt .
+:avaliadaNoEscopo a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "é avaliada no"@pt ; rdfs:domain :PosicaoRede ; rdfs:range :EscopoRede .
 
-:recomenda a owl:ObjectProperty ;
-    rdfs:domain :Diagnostico ; rdfs:range :Recomendacao ;
-    rdfs:label "recomenda"@pt .
+:naFase a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "está na fase"@pt ; rdfs:domain :PosicaoRede ; rdfs:range :FaseColecao .
 
-:sugereAcao a owl:ObjectProperty , owl:FunctionalProperty ;
-    rdfs:domain :Recomendacao ; rdfs:range :AcaoDestinacao ;
-    rdfs:label "sugere ação"@pt .
+:recebeDiagnostico a owl:ObjectProperty, owl:InverseFunctionalProperty ;
+    rdfs:label "recebe"@pt ; rdfs:domain :PosicaoRede ; rdfs:range :Diagnostico .
 
-:perspectivaDe a owl:ObjectProperty ;
-    rdfs:domain :RegraNegocio ; rdfs:range :AreaNegocio ;
-    rdfs:label "perspectiva de"@pt ;
-    rdfs:comment "Área de negócio cuja visão a regra representa. Permite comparar diagnósticos por área (hipótese H1)."@pt .
+:classificadoComo a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "é classificado como"@pt ; rdfs:domain :Diagnostico ; rdfs:range :SituacaoGiroIdade .
+
+:sustentadoPor a owl:ObjectProperty ;
+    rdfs:label "é sustentado por"@pt ; rdfs:range :Evidencia ;
+    rdfs:comment "Usada por diagnóstico e por motivo."@pt .
+
+:geradoPorRegra a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "foi gerado pela"@pt ; rdfs:range :RegraNegocio .
+
+:temMotivo a owl:ObjectProperty ;
+    rdfs:label "tem motivo"@pt ; rdfs:domain :PosicaoRede ; rdfs:range :Motivo .
+
+:doTipoMotivo a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "é do tipo"@pt ; rdfs:domain :Motivo ; rdfs:range :TipoMotivo .
+
+:naFilial a owl:ObjectProperty ;
+    rdfs:label "na filial"@pt ; rdfs:domain :Motivo ; rdfs:range :Filial ;
+    rdfs:comment "Filial a que o motivo se refere, quando ele é local (oportunidade local, bloqueio, defeito)."@pt .
+
+:considera a owl:ObjectProperty ;
+    rdfs:label "considera"@pt ; rdfs:domain :Recomendacao ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( :Diagnostico :Motivo ) ] .
+
+:sugereAcao a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "sugere"@pt ; rdfs:domain :Recomendacao ; rdfs:range :AcaoDestinacao .
+
+:destinoSugerido a owl:ObjectProperty ;
+    rdfs:label "destino sugerido"@pt ; rdfs:domain :Recomendacao ; rdfs:range :Filial .
 
 # ===========================================================================
-# Propriedades de dados (viram atributos de nós no Neo4j)
+# Propriedades de dados
 # ===========================================================================
 
-:sku a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain :Produto ; rdfs:range xsd:string .
-:descricao a owl:DatatypeProperty ; rdfs:range xsd:string .
-:categoriaProduto a owl:DatatypeProperty ; rdfs:domain :Produto ; rdfs:range xsd:string .
-:custoUnitario a owl:DatatypeProperty ; rdfs:domain :Produto ; rdfs:range xsd:decimal .
-:precoVenda a owl:DatatypeProperty ; rdfs:domain :Produto ; rdfs:range xsd:decimal .
+:codigo a owl:DatatypeProperty ; rdfs:label "código"@pt ; rdfs:range xsd:string .
+:nome a owl:DatatypeProperty ; rdfs:label "nome"@pt ; rdfs:range xsd:string ;
+    rdfs:comment "Nome atual (equivale ao rótulo preferido, skos:prefLabel)."@pt .
+:nomesAnteriores a owl:DatatypeProperty ; rdfs:label "nomes anteriores"@pt ; rdfs:range xsd:string ;
+    rdfs:comment "Nomes já usados no sistema para a mesma filial (equivalem a rótulos alternativos, skos:altLabel)."@pt .
+:descricao a owl:DatatypeProperty ; rdfs:label "descrição"@pt ; rdfs:range xsd:string .
 
-:codigo a owl:DatatypeProperty ; rdfs:range xsd:string .
-:nome a owl:DatatypeProperty ; rdfs:range xsd:string .
-:temporada a owl:DatatypeProperty ; rdfs:domain :Colecao ; rdfs:range xsd:string .
-:ano a owl:DatatypeProperty ; rdfs:domain :Colecao ; rdfs:range xsd:integer .
-:encerrada a owl:DatatypeProperty ; rdfs:domain :Colecao ; rdfs:range xsd:boolean .
-:regiao a owl:DatatypeProperty ; rdfs:domain :LocalEstoque ; rdfs:range xsd:string .
+# Marca
+:descontinuadaDesde a owl:DatatypeProperty ; rdfs:label "descontinuada desde"@pt ; rdfs:domain :Marca ; rdfs:range xsd:dateTime .
 
-:dataObservacao a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain :ObservacaoEstoque ; rdfs:range xsd:dateTime .
-:quantidadeDisponivel a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain :ObservacaoEstoque ; rdfs:range xsd:integer .
+# Coleção
+:temporada a owl:DatatypeProperty ; rdfs:label "temporada"@pt ; rdfs:domain :Colecao ; rdfs:range xsd:string .
+:ano a owl:DatatypeProperty ; rdfs:label "ano"@pt ; rdfs:domain :Colecao ; rdfs:range xsd:integer .
+:inicioColecao a owl:DatatypeProperty ; rdfs:label "início da coleção"@pt ; rdfs:domain :Colecao ; rdfs:range xsd:dateTime .
+:inicioSale a owl:DatatypeProperty ; rdfs:label "início do SALE"@pt ; rdfs:domain :Colecao ; rdfs:range xsd:dateTime .
+:inicioOff1 a owl:DatatypeProperty ; rdfs:label "início do OFF 1"@pt ; rdfs:domain :Colecao ; rdfs:range xsd:dateTime .
+:inicioOff2 a owl:DatatypeProperty ; rdfs:label "início do OFF 2"@pt ; rdfs:domain :Colecao ; rdfs:range xsd:dateTime .
+:inicioOffPC a owl:DatatypeProperty ; rdfs:label "início do OFF PC"@pt ; rdfs:domain :Colecao ; rdfs:range xsd:dateTime .
 
-:valor a owl:DatatypeProperty ; rdfs:range xsd:decimal .
-:unidade a owl:DatatypeProperty ; rdfs:domain :Indicador ; rdfs:range xsd:string .
+# Produto (níveis N_1 a N_4 como atributos)
+:negocio a owl:DatatypeProperty ; rdfs:label "negócio (N_1)"@pt ; rdfs:domain :Produto ; rdfs:range xsd:string .
+:linha a owl:DatatypeProperty ; rdfs:label "linha (N_2)"@pt ; rdfs:domain :Produto ; rdfs:range xsd:string .
+:grupo a owl:DatatypeProperty ; rdfs:label "grupo (N_3)"@pt ; rdfs:domain :Produto ; rdfs:range xsd:string .
+:subgrupo a owl:DatatypeProperty ; rdfs:label "subgrupo (N_4)"@pt ; rdfs:domain :Produto ; rdfs:range xsd:string .
 
-:operador a owl:DatatypeProperty ; rdfs:domain :CriterioDiagnostico ; rdfs:range xsd:string .
-:limite a owl:DatatypeProperty ; rdfs:domain :CriterioDiagnostico ; rdfs:range xsd:decimal .
-:versao a owl:DatatypeProperty ; rdfs:range xsd:string .
-:valorObservado a owl:DatatypeProperty ; rdfs:domain :Evidencia ; rdfs:range xsd:decimal .
-:dataAvaliacao a owl:DatatypeProperty ; rdfs:domain :Diagnostico ; rdfs:range xsd:dateTime .
-:justificativa a owl:DatatypeProperty ; rdfs:range xsd:string .
-:arquivo a owl:DatatypeProperty ; rdfs:domain :RegraNegocio ; rdfs:range xsd:string ;
-    rdfs:comment "Arquivo .cypher que implementa a regra."@pt .
+# Produto-cor e SKU
+:cor a owl:DatatypeProperty ; rdfs:label "cor"@pt ; rdfs:domain :ProdutoCor ; rdfs:range xsd:string .
+:dataLancamento a owl:DatatypeProperty ; rdfs:label "data de lançamento"@pt ; rdfs:domain :ProdutoCor ; rdfs:range xsd:dateTime .
+:origemDataLancamento a owl:DatatypeProperty ; rdfs:label "origem da data de lançamento"@pt ; rdfs:domain :ProdutoCor ; rdfs:range xsd:string .
+:canceladoPeloEstilo a owl:DatatypeProperty ; rdfs:label "cancelado pelo estilo"@pt ; rdfs:domain :ProdutoCor ; rdfs:range xsd:boolean .
+:custoUnitario a owl:DatatypeProperty ; rdfs:label "custo unitário"@pt ; rdfs:domain :ProdutoCor ; rdfs:range xsd:decimal .
+:tamanho a owl:DatatypeProperty ; rdfs:label "tamanho"@pt ; rdfs:domain :SKU ; rdfs:range xsd:string .
+:grade a owl:DatatypeProperty ; rdfs:label "grade de tamanho"@pt ; rdfs:domain :SKU ; rdfs:range xsd:string .
+
+# Filial
+:cidade a owl:DatatypeProperty ; rdfs:label "cidade"@pt ; rdfs:domain :Filial ; rdfs:range xsd:string .
+:estado a owl:DatatypeProperty ; rdfs:label "estado"@pt ; rdfs:domain :Filial ; rdfs:range xsd:string .
+:regiao a owl:DatatypeProperty ; rdfs:label "região"@pt ; rdfs:domain :Filial ; rdfs:range xsd:string .
+:dataAbertura a owl:DatatypeProperty ; rdfs:label "data de abertura"@pt ; rdfs:domain :Filial ; rdfs:range xsd:dateTime .
+:dataFechamento a owl:DatatypeProperty ; rdfs:label "data de fechamento"@pt ; rdfs:domain :Filial ; rdfs:range xsd:dateTime .
+
+# Classificação com vigência
+:validoDe a owl:DatatypeProperty ; rdfs:label "válido de"@pt ; rdfs:domain :ClassificacaoVigencia ; rdfs:range xsd:dateTime .
+:validoAte a owl:DatatypeProperty ; rdfs:label "válido até"@pt ; rdfs:domain :ClassificacaoVigencia ; rdfs:range xsd:dateTime ;
+    rdfs:comment "Ausente = ainda vigente."@pt .
+
+# Fatos
+:dataReferencia a owl:DatatypeProperty ; rdfs:label "data de referência"@pt ; rdfs:range xsd:dateTime .
+:quantidade a owl:DatatypeProperty ; rdfs:label "quantidade"@pt ; rdfs:range xsd:integer .
+:dataVenda a owl:DatatypeProperty ; rdfs:label "data da venda"@pt ; rdfs:domain :Venda ; rdfs:range xsd:dateTime .
+:tipoMovimento a owl:DatatypeProperty ; rdfs:label "tipo de movimento"@pt ; rdfs:domain :Venda ; rdfs:range xsd:string ;
+    rdfs:comment "venda, cancelamento ou devolução."@pt .
+:alertaConsistencia a owl:DatatypeProperty ; rdfs:label "alerta de consistência"@pt ; rdfs:range xsd:string ;
+    rdfs:comment "Saldo negativo ou saldo em filial fechada: não gera diagnóstico, só alerta."@pt .
+
+# Posição na rede (valores calculados pela regra R00)
+:saldoRede a owl:DatatypeProperty ; rdfs:label "saldo na rede"@pt ; rdfs:domain :PosicaoRede ; rdfs:range xsd:integer .
+:valorACusto a owl:DatatypeProperty ; rdfs:label "valor a custo"@pt ; rdfs:domain :PosicaoRede ; rdfs:range xsd:decimal .
+:ultimaVendaValida a owl:DatatypeProperty ; rdfs:label "última venda válida"@pt ; rdfs:domain :PosicaoRede ; rdfs:range xsd:dateTime .
+:diasSemVenda a owl:DatatypeProperty ; rdfs:label "dias sem venda válida"@pt ; rdfs:domain :PosicaoRede ; rdfs:range xsd:integer .
+:idadeMeses a owl:DatatypeProperty ; rdfs:label "idade desde o lançamento (meses)"@pt ; rdfs:domain :PosicaoRede ; rdfs:range xsd:integer .
+:custoOportunidade a owl:DatatypeProperty ; rdfs:label "custo de oportunidade"@pt ; rdfs:domain :PosicaoRede ; rdfs:range xsd:decimal ;
+    rdfs:comment "Valor a custo x taxa anual de custo de capital x dias sem venda / 365. Proposta original do projeto."@pt .
+
+# Diagnóstico, evidência, regra, motivo, recomendação
+:dataAvaliacao a owl:DatatypeProperty ; rdfs:label "data de avaliação"@pt ; rdfs:range xsd:dateTime .
+:versao a owl:DatatypeProperty ; rdfs:label "versão"@pt ; rdfs:range xsd:string .
+:arquivo a owl:DatatypeProperty ; rdfs:label "arquivo"@pt ; rdfs:domain :RegraNegocio ; rdfs:range xsd:string .
+:areaResponsavel a owl:DatatypeProperty ; rdfs:label "área responsável"@pt ; rdfs:domain :RegraNegocio ; rdfs:range xsd:string .
+:criterio a owl:DatatypeProperty ; rdfs:label "critério"@pt ; rdfs:domain :Evidencia ; rdfs:range xsd:string .
+:valorObservado a owl:DatatypeProperty ; rdfs:label "valor observado"@pt ; rdfs:domain :Evidencia ; rdfs:range xsd:decimal .
+:limite a owl:DatatypeProperty ; rdfs:label "limite"@pt ; rdfs:domain :Evidencia ; rdfs:range xsd:decimal .
+:justificativa a owl:DatatypeProperty ; rdfs:label "justificativa"@pt ; rdfs:range xsd:string .
+:percentualSugerido a owl:DatatypeProperty ; rdfs:label "percentual sugerido"@pt ; rdfs:domain :Recomendacao ; rdfs:range xsd:decimal .
+:prioridade a owl:DatatypeProperty ; rdfs:label "prioridade"@pt ; rdfs:domain :Recomendacao ; rdfs:range xsd:integer ;
+    rdfs:comment "1 = atuar primeiro. Ordenada pelo custo de oportunidade; o excesso entra como qualificador na V1."@pt .

@@ -3,34 +3,39 @@
 As questões de competência (CQs) delimitam o que a ontologia e o software precisam responder
 (Grüninger e Fox, 1995). Cada CQ abaixo vira um teste automatizado em `tests/test_questoes_competencia.py`.
 
-**Origem:** CQ01 a CQ05 vêm da seção 4.2 do relatório técnico MCC 06/2026 (Porto e Lifschitz).
-CQ06 a CQ08 foram acrescentadas no planejamento do Projeto Final para cobrir o contexto
-(loja e data), a ausência de dados e o custo de oportunidade.
+**Origem:** as CQs da versão 0.2.0 (ontologia V_Zero) seguem o documento de definições de estoque obsoleto
+usado como base do projeto e as decisões de validação de 17/11/2026. Elas substituem as CQs da versão 0.1.0,
+que vinham da seção 4.2 do relatório técnico MCC 06/2026 (Porto e Lifschitz) e continuam cobertas: classificação
+(CQ01, CQ02), indicadores e evidências (CQ03, CQ04), fatores (CQ05, CQ06), destinação (CQ11) e regras (CQ09).
 
-| Código | Pergunta | Origem | Dados necessários | Teste (critério de aceite) |
-| --- | --- | --- | --- | --- |
-| CQ01 | Um produto pode ser classificado como estoque obsoleto? | Relatório técnico, 4.2 | Idade do estoque, vendas no período, quantidade disponível | Toda observação recebe exatamente um diagnóstico; os casos de controle saem na categoria esperada |
-| CQ02 | Quais indicadores sustentam essa classificação? | Relatório técnico, 4.2 | Indicadores calculados por observação | Todo diagnóstico diferente de Ativo tem ao menos uma evidência ligada a um indicador |
-| CQ03 | Quais fatores ou condições contribuíram para o diagnóstico? | Relatório técnico, 4.2 | Critérios atendidos e causas prováveis | Cada evidência aponta o critério que atendeu, com valor observado e limite |
-| CQ04 | Quais alternativas de destinação são recomendadas para determinado contexto? | Relatório técnico, 4.2 | Diagnóstico, coleção, situação do mesmo SKU em outras lojas | Todo diagnóstico Lento ou obsoleto recebe ao menos uma recomendação |
-| CQ05 | Quais regras de negócio justificam a recomendação produzida? | Relatório técnico, 4.2 | Identificador e versão da regra | Toda recomendação aponta a regra (id + versão) que a gerou |
-| CQ06 | O diagnóstico de um produto muda entre lojas ou períodos? | Planejamento do PFP | Observações do mesmo SKU em lojas diferentes | Existe ao menos um SKU com categorias diferentes em lojas diferentes no dataset de exemplo |
-| CQ07 | Quais informações são insuficientes para um diagnóstico confiável? | Planejamento do PFP | Campos obrigatórios por observação | Observações sem vendas registradas ou sem idade recebem Dados insuficientes, nunca Lento ou obsoleto |
-| CQ08 | Qual é o custo de oportunidade do capital parado em cada estoque? | Planejamento do PFP (extensão em relação ao relatório) | Custo unitário, quantidade, idade, taxa de custo de capital | O valor calculado confere com a fórmula documentada; sem custo unitário, o valor fica ausente e o SKU sai do ranking financeiro |
+**Unidade de diagnóstico:** produto-cor × escopo de rede × data de referência (a posição na rede).
 
-## Categorias de diagnóstico
-
-As quatro categorias seguem a Figura 1 do relatório técnico (classificação por idade do estoque e
-relação entre demanda e estoque, NetSuite, 2024). A quinta categoria trata a hipótese de mundo aberto:
-ausência de registro não é evidência de ausência de venda.
-
-| Categoria | Idade do estoque | Cobertura (dias de venda que o estoque dura) |
+| Código | Pergunta | Teste (critério de aceite) |
 | --- | --- | --- |
-| Ativo | até o limite | até o limite |
-| Excesso | até o limite | acima do limite |
-| Envelhecido | acima do limite | até o limite |
-| Lento ou obsoleto | acima do limite | acima do limite (ou sem venda no período) |
-| Dados insuficientes | ausente | ausente |
+| CQ01 | Toda posição na rede com saldo positivo tem um diagnóstico? | Exatamente um diagnóstico por posição com saldo > 0; nenhum para saldo ≤ 0 |
+| CQ02 | Qual é a situação de giro e idade de cada produto-cor? | Os casos de controle (`CTRL-*`) saem na situação esperada |
+| CQ03 | Quais evidências e qual regra sustentam o diagnóstico? | Todo diagnóstico tem evidência C01 (saldo), C02 e C03 (dias e meses) ou C04 (dados insuficientes), e aponta a regra na versão vigente |
+| CQ04 | A situação respeita os limites de 180 dias e 24 meses? | A situação gravada bate com os valores calculados; limites estritos (24 meses e 180 dias exatos ficam Ativo) |
+| CQ05 | Quais motivos se somam à situação? | Marca descontinuada e produto com defeito são registrados mesmo para produto Ativo |
+| CQ06 | Há oportunidade local de transferência? | Só em filial de venda aberta há mais de 12 meses, sem venda local há mais de 180 dias, com destino que vendeu recentemente |
+| CQ07 | Quais vendas contam? | Só vendas válidas, das filiais do escopo, com nomes anteriores de filial traduzidos para o código atual |
+| CQ08 | Qual é o custo de oportunidade e em que ordem atuar? | O custo confere com a fórmula; a prioridade 1, 2, 3... segue o custo em ordem decrescente |
+| CQ09 | Toda recomendação é rastreável? | Toda recomendação considera um diagnóstico ou motivo, sugere uma ação e aponta a regra versionada; todo potencialmente obsoleto e todo motivo (exceto defeito) tem recomendação |
+| CQ10 | O que fica fora por dado inconsistente ou incompleto? | Saldo negativo gera alerta e não recebe diagnóstico; sem data de lançamento, só Diagnóstico pendente |
+| CQ11 | Qual destinação cada motivo recebe? | Cancelado → recolher e enviar à filial de defeito; bloqueio → manter no CD (causa provável da falta de venda); contínuo → revisar classificação |
 
-Os limites ficam em `regras/parametros.yaml`. **Os valores iniciais são hipotéticos** e precisam ser
-validados com especialistas antes de qualquer uso real.
+## Situações de giro e idade
+
+| Situação | Mais de 180 dias sem venda válida na rede | Mais de 24 meses desde o lançamento |
+| --- | --- | --- |
+| Ativo | não | não |
+| Antigo com giro | não | sim |
+| Sem giro em atenção | sim | não |
+| Potencialmente obsoleto | sim | sim |
+| Diagnóstico pendente | sem data de lançamento ou janela de vendas incompleta | |
+
+Os limites ficam em `regras/parametros.yaml`. Potencialmente obsoleto recomenda avaliar destinação e write-off
+por ação comercial, **sem baixa automática**.
+
+**Custo de oportunidade (proposta original do projeto, não vem do documento de definições):**
+valor a custo × taxa anual de custo de capital (15%) × dias sem venda / 365.

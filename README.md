@@ -7,21 +7,28 @@ Projeto Final de Programação (INF2102, PUC-Rio), de Leandro Porto, com orienta
 Continua o relatório técnico *Ontologia para diagnóstico e destinação de estoques obsoletos no Varejo de Moda*
 (Monografias em Ciência da Computação nº 06/2026, DI/PUC-Rio).
 
-> **Estado:** versão 0.1.0, prova de conceito em desenvolvimento. Os dados de exemplo são fictícios e os limites
-> das regras são hipotéticos, ainda não validados com especialistas.
+> **Estado:** versão 0.2.0 (ontologia V_Zero), prova de conceito em desenvolvimento. Os dados de exemplo são
+> fictícios (marcas e filiais inventadas). Os limites das regras (24 meses e 180 dias) seguem o documento de
+> definições validado em 17/11/2026; a definição de venda válida e a fórmula de excesso ainda estão em aberto.
 
 ## O que o programa faz
 
-1. Lê uma ontologia OWL que define o vocabulário do domínio: produto, coleção, local, observação de estoque,
-   indicador, critério, evidência, diagnóstico, causa provável, recomendação, regra e área de negócio.
-2. Carrega no Neo4j dados de produtos, coleções, locais e estoques (CSV).
-3. Executa regras de negócio explícitas e versionadas, escritas em Cypher, que:
-   - calculam indicadores (cobertura, sell-through, custo de oportunidade);
-   - classificam cada estoque, em cada loja e data, como **Ativo, Excesso, Envelhecido, Lento ou obsoleto** ou
-     **Dados insuficientes**;
-   - registram as evidências e causas prováveis de cada diagnóstico;
-   - recomendam ações de destinação (transferência entre lojas, remarcação, liquidação).
-4. Mostra tudo numa interface web (Streamlit), incluindo, para cada diagnóstico, a regra e a versão que o produziram.
+1. Lê uma ontologia OWL (`ontologia/retail_ontologos.ttl`) com o vocabulário do domínio: marca, coleção, produto,
+   produto-cor, SKU, filial, escopo de rede, classificação com vigência, posição de estoque, posição na rede,
+   venda, diagnóstico, evidência, motivo, recomendação e regra de negócio.
+2. Carrega no Neo4j marcas, coleções, filiais (com nomes anteriores), produtos, classificações, estoque e vendas (CSV).
+3. Executa regras de negócio explícitas e versionadas, escritas em Cypher:
+   - **R00 preparação:** consolida o saldo de cada produto-cor nas filiais do escopo, calcula dias sem venda válida
+     na rede, meses desde o lançamento e custo de oportunidade, e marca dados inconsistentes (saldo negativo);
+   - **R01 diagnóstico:** classifica cada produto-cor com saldo positivo como **Ativo, Antigo com giro, Sem giro em
+     atenção, Potencialmente obsoleto** ou **Diagnóstico pendente** (mais de 180 dias sem venda × mais de 24 meses
+     desde o lançamento, limites estritos), com as evidências de cada critério;
+   - **R02 motivos:** registra motivos que coexistem com a situação (marca descontinuada, produto com defeito,
+     produto cancelado, oportunidade local, bloqueio de envio, contínuo com sinal de obsolescência);
+   - **R03 recomendação:** sugere a destinação de cada motivo e de cada potencialmente obsoleto (transferência,
+     ação comercial, baixa, recolher e enviar à filial de defeito, manter no CD, revisar classificação) e ordena
+     as recomendações pelo custo de oportunidade.
+4. Mostra tudo numa interface web (Streamlit), incluindo, para cada diagnóstico, as evidências, a regra e a versão.
 
 ## Como rodar
 
@@ -66,8 +73,8 @@ entre o grafo e a ontologia. Sem Neo4j disponível, os testes que dependem do ba
 | Pasta | Conteúdo |
 | --- | --- |
 | `ontologia/` | Ontologia OWL em Turtle (abre no [Protégé](https://protege.stanford.edu/)) |
-| `regras/` | Regras em Cypher, uma consulta por regra, e `parametros.yaml` com limites e taxa de custo de capital |
-| `dados/exemplo/` | Dataset sintético (semente 42) |
+| `regras/` | Regras em Cypher (`01_preparacao` a `04_recomendacao`) e `parametros.yaml` com data de referência, escopo, limites e taxa de custo de capital |
+| `dados/exemplo/` | Dataset sintético (120 produtos, semente 42, mais 17 casos de controle `CTRL-*`) no formato de marcas, coleções, filiais, produtos, produtos_cor, skus, classificacoes, estoque e vendas |
 | `src/retail_ontologos/` | Gerador de dados, carga, motor de regras, leitura da ontologia |
 | `app/` | Interface Streamlit |
 | `tests/` | Testes automatizados |
@@ -76,7 +83,7 @@ entre o grafo e a ontologia. Sem Neo4j disponível, os testes que dependem do ba
 ## Como mudar uma regra
 
 1. Ajuste os limites em `regras/parametros.yaml` ou a consulta no arquivo `.cypher` correspondente.
-2. Suba a versão no cabeçalho da regra (`// regra: R01 | versao: 0.2.0 | ...`).
+2. Suba `versao_regras` em `parametros.yaml` e a versão no cabeçalho da regra (`// regra: R01 | versao: 0.2.0 | ...`).
 3. Rode `python -m retail_ontologos.motor` e `python -m pytest`.
 
 ## Licença
