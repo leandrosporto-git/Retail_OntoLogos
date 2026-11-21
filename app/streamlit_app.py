@@ -5,6 +5,7 @@ Execute com:  streamlit run app/streamlit_app.py
 import sys
 from pathlib import Path
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -14,6 +15,16 @@ from retail_ontologos import carga, motor  # noqa: E402
 from retail_ontologos.conexao import conectar  # noqa: E402
 
 st.set_page_config(page_title="Retail OntoLogos", layout="wide")
+
+PARAM = carga.ler_parametros()
+DIAS_DEMANDA = PARAM["limites"]["dias_sem_venda"]  # janela da demanda = janela da regra de giro
+FAIXAS = ["0 a 12 meses", "12 a 24 meses", "24 a 36 meses", "36 a 48 meses", "48 a 60 meses", "Mais de 60 meses"]
+
+
+def faixa_idade(meses) -> str:
+    if pd.isna(meses):
+        return "Sem data"
+    return FAIXAS[min(int(meses) // 12, len(FAIXAS) - 1)]
 
 SITUACOES = ["Ativo", "AntigoComGiro", "SemGiroEmAtencao", "PotencialmenteObsoleto", "DiagnosticoPendente"]
 ROTULOS = {"Ativo": "Ativo", "AntigoComGiro": "Antigo com giro", "SemGiroEmAtencao": "Sem giro em atenção",
@@ -64,11 +75,21 @@ base = consultar("""
            s.nome AS situacao, f.descricao AS Fase, r.saldoRede AS Saldo, r.idadeMeses AS `Idade (meses)`,
            r.diasSemVenda AS `Dias sem venda`, r.valorACusto AS `Valor a custo (R$)`,
            r.custoOportunidade AS `Custo de oportunidade (R$)`,
-           [(r)-[:TEM_MOTIVO]->(:Motivo)-[:DO_TIPO_MOTIVO]->(t) | t.descricao] AS Motivos""")
+           [(r)-[:TEM_MOTIVO]->(:Motivo)-[:DO_TIPO_MOTIVO]->(t) | t.descricao] AS Motivos,
+           reduce(s = 0, q IN [(r)-[:AVALIADA_NO_ESCOPO]->(:EscopoRede)-[:INCLUI_FILIAL]->(:Filial)<-[:OCORREU_EM]-(v:Venda)-[:REFERE_SE_A]->(pc)
+                               WHERE v.tipoMovimento IN $tipos AND v.dataVenda <= r.dataReferencia
+                                 AND v.dataVenda > r.dataReferencia - duration({days: $dias}) | v.quantidade] | s + q) AS demanda,
+           coalesce(pc.custoUnitario, 0) * reduce(s = 0, q IN [(r)-[:CONSOLIDA]->(p)-[:TEM_CONDICAO]->(:CondicaoComercial {nome: 'ComDefeito'})
+                               | p.quantidade] | s + q) AS valorComDefeito""",
+                 tipos=PARAM["venda_valida"]["tipos"], dias=DIAS_DEMANDA)
 if base.empty:
     st.warning("O grafo está vazio. Use o botão na barra lateral para carregar os dados de exemplo.")
     st.stop()
 base["Situação"] = base.pop("situacao").map(ROTULOS)
+base["Faixa de idade"] = base["Idade (meses)"].map(faixa_idade)
+base["Valor sem defeito (R$)"] = base["Valor a custo (R$)"].fillna(0) - base["valorComDefeito"]
+base["Valor com defeito (R$)"] = base.pop("valorComDefeito")
+base[f"Demanda {DIAS_DEMANDA} dias (peças)"] = base.pop("demanda")
 
 filtro = base.copy()
 if f_marcas:
@@ -81,12 +102,42 @@ with aba_visao:
     c1.metric("Produtos-cor no filtro", f"{len(filtro):,}".replace(",", "."))
     c2.metric("Peças", f"{int(filtro['Saldo'].sum()):,}".replace(",", "."))
     c3.metric("Custo de oportunidade (R$)", f"{filtro['Custo de oportunidade (R$)'].sum():,.0f}".replace(",", "."))
+    st.subheader("Demanda e valor do estoque por idade")
+    st.caption(f"Peças vendidas nos últimos {DIAS_DEMANDA} dias (linha, eixo da esquerda) e valor do estoque a custo, "
+               "com e sem defeito (barras, eixo da direita), por faixa de idade desde o lançamento. Mostra todas as "
+               "situações, para comparar a carteira inteira; respeita só o filtro de marca.")
+    ordem = FAIXAS + ["Sem data"]
+    col_dem = f"Demanda {DIAS_DEMANDA} dias (peças)"
+    carteira = base[base["Marca"].isin(f_marcas)] if f_marcas else base
+    por_faixa = (carteira.groupby("Faixa de idade")[[col_dem, "Valor sem defeito (R$)", "Valor com defeito (R$)"]].sum()
+                 .reindex(ordem).fillna(0).reset_index())
+    tem_dado = (por_faixa[col_dem] > 0) | (por_faixa["Valor sem defeito (R$)"] + por_faixa["Valor com defeito (R$)"] > 0)
+    por_faixa = por_faixa[tem_dado | por_faixa["Faixa de idade"].isin(FAIXAS)]
+    valores = por_faixa.melt("Faixa de idade", ["Valor sem defeito (R$)", "Valor com defeito (R$)"],
+                             var_name="Condição", value_name="Valor (R$)")
+    valores["Condição"] = valores["Condição"].map({"Valor sem defeito (R$)": "Sem defeito",
+                                                   "Valor com defeito (R$)": "Com defeito"})
+    eixo_x = alt.X("Faixa de idade:N", sort=list(por_faixa["Faixa de idade"]), title="Idade do estoque",
+                   axis=alt.Axis(labelAngle=0))
+    barras = alt.Chart(valores).mark_bar(opacity=0.85).encode(
+        x=eixo_x,
+        y=alt.Y("Valor (R$):Q", title="Valor do estoque a custo (R$)", axis=alt.Axis(orient="right", format=",.0f")),
+        color=alt.Color("Condição:N", scale=alt.Scale(domain=["Sem defeito", "Com defeito"], range=["#4C78A8", "#E45756"]),
+                        legend=alt.Legend(title="Valor a custo", orient="top")),
+        order=alt.Order("Condição:N", sort="descending"),
+        tooltip=["Faixa de idade", "Condição", alt.Tooltip("Valor (R$):Q", format=",.0f")])
+    linha = alt.Chart(por_faixa).mark_line(point=alt.OverlayMarkDef(size=70), color="#1B1B1B", strokeWidth=2.5).encode(
+        x=eixo_x,
+        y=alt.Y(f"{col_dem}:Q", title=f"Demanda: peças vendidas em {DIAS_DEMANDA} dias", axis=alt.Axis(orient="left", format=",.0f")),
+        tooltip=["Faixa de idade", alt.Tooltip(f"{col_dem}:Q", format=",.0f")])
+    st.altair_chart(alt.layer(barras, linha).resolve_scale(y="independent").properties(height=380),
+                    use_container_width=True)
     st.subheader("Custo de oportunidade por situação")
     resumo = (base.groupby("Situação")["Custo de oportunidade (R$)"].sum()
               .reindex([ROTULOS[s] for s in SITUACOES]).fillna(0))
     st.bar_chart(resumo, horizontal=True)
     st.subheader("Produtos-cor ordenados por custo de oportunidade")
-    st.dataframe(filtro.sort_values("Custo de oportunidade (R$)", ascending=False, na_position="last"),
+    st.dataframe(filtro.drop(columns=["Faixa de idade"]).sort_values("Custo de oportunidade (R$)", ascending=False, na_position="last"),
                  hide_index=True, use_container_width=True)
     alertas = consultar("""
         MATCH (r:PosicaoRede)-[:REFERE_SE_A]->(pc) WHERE r.alertaConsistencia IS NOT NULL
