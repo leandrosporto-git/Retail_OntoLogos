@@ -131,11 +131,16 @@ def test_cq09_recomendacoes_sao_rastreaveis(consultar):
            OR NOT EXISTS { (rec)-[:GERADO_POR_REGRA]->(r:RegraNegocio) WHERE r.versao IS NOT NULL }
         RETURN rec.id AS recomendacao""") == []
     assert consultar("""
-        MATCH (d:Diagnostico)-[:CLASSIFICADO_COMO]->(:SituacaoGiroIdade {nome: 'PotencialmenteObsoleto'})
-        WHERE NOT EXISTS { (:Recomendacao)-[:CONSIDERA]->(d) } RETURN d.id AS diagnostico""") == []
-    # Todo motivo tem recomendação, exceto defeito: as peças já estão no fluxo de qualidade.
+        MATCH (r)-[:RECEBE_DIAGNOSTICO]->(d:Diagnostico)-[:CLASSIFICADO_COMO]->(:SituacaoGiroIdade {nome: 'PotencialmenteObsoleto'})
+        WHERE NOT EXISTS { (:Recomendacao)-[:CONSIDERA]->(d) }
+          AND NOT EXISTS { (:Recomendacao)-[:CONSIDERA]->(:Motivo)<-[:TEM_MOTIVO]-(r) }
+        RETURN d.id AS diagnostico""") == []
+    # Todo motivo tem recomendação, exceto defeito sem sinal de falta de giro (com giro ou pendente):
+    # as peças seguem o fluxo de qualidade.
     assert consultar("""
-        MATCH (m:Motivo)-[:DO_TIPO_MOTIVO]->(t:TipoMotivo) WHERE t.nome <> 'ProdutoComDefeito'
+        MATCH (r:PosicaoRede)-[:TEM_MOTIVO]->(m:Motivo)-[:DO_TIPO_MOTIVO]->(t:TipoMotivo),
+              (r)-[:RECEBE_DIAGNOSTICO]->()-[:CLASSIFICADO_COMO]->(s)
+        WHERE NOT (t.nome = 'ProdutoComDefeito' AND NOT s.nome IN ['SemGiroEmAtencao', 'PotencialmenteObsoleto'])
           AND NOT EXISTS { (:Recomendacao)-[:CONSIDERA]->(m) } RETURN m.id AS motivo""") == []
 
 
@@ -164,3 +169,31 @@ def test_cq11_destinacao_por_motivo(consultar, pc, motivo, acao):
 def test_cq11_bloqueio_explica_a_falta_de_venda(consultar):
     [m] = _motivos(consultar, "CTRL-BLOQUEIO")
     assert "causa provável" in m["justificativa"]
+
+
+# CQ12 -----------------------------------------------------------------------
+def _acoes_do_produto(consultar, pc):
+    return sorted(a["acao"] for a in consultar("""
+        MATCH (:ProdutoCor {codigo: $pc})<-[:REFERE_SE_A]-(r:PosicaoRede), (rec:Recomendacao)-[:CONSIDERA]->(x)
+        WHERE (r)-[:TEM_MOTIVO]->(x) OR (r)-[:RECEBE_DIAGNOSTICO]->(x)
+        MATCH (rec)-[:SUGERE_ACAO]->(a:AcaoDestinacao) RETURN a.nome AS acao""", pc=pc))
+
+
+def test_cq12_baixa_para_produto_sem_valor_comercial(consultar):
+    # Coleção com mais de 5 anos e sem giro: baixa, no lugar da ação comercial.
+    assert [m["motivo"] for m in _motivos(consultar, "CTRL-MUITO-ANTIGO")] == ["ColecaoMuitoAntiga"]
+    assert _acoes_do_produto(consultar, "CTRL-MUITO-ANTIGO") == ["Baixa"]
+    # Defeito sem giro: baixa das peças com defeito (e ação comercial pelo diagnóstico).
+    [m] = _motivos(consultar, "CTRL-DEFEITO-SEM-GIRO")
+    assert (m["motivo"], m["acao"], m["percentual"]) == ("ProdutoComDefeito", "Baixa", 100)
+    # Defeito com giro: sem recomendação de baixa.
+    assert _acoes_do_produto(consultar, "CTRL-DEFEITO") == []
+    # Potencialmente obsoleto até 5 anos: ação comercial, sem baixa automática.
+    assert _acoes_do_produto(consultar, "CTRL-OBSOLETO") == ["AcaoComercial"]
+    # Nenhum produto com giro recebe o motivo de coleção com mais de 5 anos.
+    assert consultar("""
+        MATCH (r:PosicaoRede)-[:TEM_MOTIVO]->(:Motivo)-[:DO_TIPO_MOTIVO]->(:TipoMotivo {nome: 'ColecaoMuitoAntiga'}),
+              (r)-[:RECEBE_DIAGNOSTICO]->()-[:CLASSIFICADO_COMO]->(s), (r)-[:REFERE_SE_A]->(pc:ProdutoCor)
+        WHERE s.nome IN ['Ativo', 'AntigoComGiro']
+           OR r.dataReferencia <= pc.dataLancamento + duration({months: $meses})
+        RETURN r.id AS posicao""", meses=PARAM["limites"]["idade_meses_baixa"]) == []

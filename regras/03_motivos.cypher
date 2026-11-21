@@ -1,4 +1,4 @@
-// regra: R02 | versao: 0.2.0 | area: Planejamento
+// regra: R02 | versao: 0.3.0 | area: Planejamento
 // descricao: Motivo marca descontinuada: a marca do produto está descontinuada na data de referência. Coexiste com qualquer situação.
 MATCH (regra:RegraNegocio {id: 'R02'}), (t:TipoMotivo {nome: 'MarcaDescontinuada'})
 MATCH (r:PosicaoRede)-[:REFERE_SE_A]->(:ProdutoCor)-[:VARIACAO_DE]->(:Produto)-[:PERTENCE_A_MARCA]->(m:Marca)
@@ -9,7 +9,7 @@ CREATE (mo)-[:GERADO_POR_REGRA]->(regra)
 CREATE (mo)-[:SUSTENTADO_POR]->(:Evidencia {id: mo.id + '-E', criterio: 'M01 marca descontinuada', justificativa: mo.justificativa})
 RETURN count(mo) AS motivos;
 
-// regra: R02 | versao: 0.2.0 | area: Operacoes
+// regra: R02 | versao: 0.3.0 | area: Operacoes
 // descricao: Motivo produto com defeito: há saldo do produto-cor em filial de defeito. A quantidade afetada é registrada por filial.
 MATCH (regra:RegraNegocio {id: 'R02'}), (t:TipoMotivo {nome: 'ProdutoComDefeito'})
 MATCH (r:PosicaoRede)-[:CONSOLIDA]->(p:PosicaoEstoque)-[:TEM_CONDICAO]->(:CondicaoComercial {nome: 'ComDefeito'}),
@@ -24,7 +24,7 @@ CREATE (mo)-[:SUSTENTADO_POR]->(:Evidencia {id: mo.id + '-E', criterio: 'M02 sal
         valorObservado: p.quantidade, justificativa: mo.justificativa})
 RETURN count(mo) AS motivos;
 
-// regra: R02 | versao: 0.2.0 | area: Comercial
+// regra: R02 | versao: 0.3.0 | area: Comercial
 // descricao: Motivo produto cancelado: o estilo pediu para recolher o produto-cor da venda, em todas as filiais.
 MATCH (regra:RegraNegocio {id: 'R02'}), (t:TipoMotivo {nome: 'ProdutoCancelado'})
 MATCH (r:PosicaoRede)-[:REFERE_SE_A]->(pc:ProdutoCor {canceladoPeloEstilo: true})
@@ -35,7 +35,7 @@ CREATE (mo)-[:GERADO_POR_REGRA]->(regra)
 CREATE (mo)-[:SUSTENTADO_POR]->(:Evidencia {id: mo.id + '-E', criterio: 'M03 cancelado pelo estilo', justificativa: mo.justificativa})
 RETURN count(mo) AS motivos;
 
-// regra: R02 | versao: 0.2.0 | area: Comercial
+// regra: R02 | versao: 0.3.0 | area: Comercial
 // descricao: Motivo oportunidade local: a rede tem giro, mas uma filial de venda aberta há mais de 12 meses está há mais de 180 dias sem venda válida do produto-cor. Filial nova, CD e filial de defeito não entram.
 MATCH (regra:RegraNegocio {id: 'R02'}), (t:TipoMotivo {nome: 'OportunidadeLocal'})
 MATCH (r:PosicaoRede)-[:RECEBE_DIAGNOSTICO]->(:Diagnostico)-[:CLASSIFICADO_COMO]->(s:SituacaoGiroIdade)
@@ -61,7 +61,7 @@ CREATE (mo)-[:SUSTENTADO_POR]->(:Evidencia {id: mo.id + '-E', criterio: 'M04 sem
         valorObservado: diasLocal, limite: $dias_sem_venda, justificativa: mo.justificativa})
 RETURN count(mo) AS motivos;
 
-// regra: R02 | versao: 0.2.0 | area: Operacoes
+// regra: R02 | versao: 0.3.0 | area: Operacoes
 // descricao: Motivo bloqueio de envio: há bloqueio vigente do produto-cor para uma filial de destino. Quando a situação é sem giro, o bloqueio é registrado como causa provável da falta de venda.
 MATCH (regra:RegraNegocio {id: 'R02'}), (t:TipoMotivo {nome: 'BloqueioDeEnvio'})
 MATCH (r:PosicaoRede)-[:REFERE_SE_A]->(:ProdutoCor)-[:TEM_CLASSIFICACAO]->(c:ClassificacaoVigencia)-[:TEM_VALOR]->(:TipoRestricao {nome: 'BloqueioEnvio'}),
@@ -77,7 +77,7 @@ CREATE (mo)-[:GERADO_POR_REGRA]->(regra)
 CREATE (mo)-[:SUSTENTADO_POR]->(:Evidencia {id: mo.id + '-E', criterio: 'M05 bloqueio vigente', justificativa: mo.justificativa})
 RETURN count(mo) AS motivos;
 
-// regra: R02 | versao: 0.2.0 | area: Planejamento
+// regra: R02 | versao: 0.3.0 | area: Planejamento
 // descricao: Motivo contínuo com sinal de obsolescência: produto-cor classificado como contínuo segue a mesma regra; se estiver sem giro, a classificação deve ser revista com a área de negócio.
 MATCH (regra:RegraNegocio {id: 'R02'}), (t:TipoMotivo {nome: 'ContinuoComSinalObsolescencia'})
 MATCH (r:PosicaoRede)-[:REFERE_SE_A]->(:ProdutoCor)-[:TEM_CLASSIFICACAO]->(c:ClassificacaoVigencia)-[:TEM_VALOR]->(:TipoColecao {nome: 'TipoColecaoContinuo'})
@@ -89,4 +89,20 @@ CREATE (r)-[:TEM_MOTIVO]->(mo:Motivo {id: r.id + '-ContinuoComSinalObsolescencia
 CREATE (mo)-[:DO_TIPO_MOTIVO]->(t)
 CREATE (mo)-[:GERADO_POR_REGRA]->(regra)
 CREATE (mo)-[:SUSTENTADO_POR]->(:Evidencia {id: mo.id + '-E', criterio: 'M06 contínuo sem giro', justificativa: mo.justificativa})
+RETURN count(mo) AS motivos;
+
+// regra: R02 | versao: 0.3.0 | area: Planejamento
+// descricao: Motivo coleção com mais de 5 anos: produto-cor lançado há mais de 60 meses (meses de calendário, estrito) e sem giro na rede. Sem valor comercial, candidato à baixa (revisão de 20/11/2026).
+MATCH (regra:RegraNegocio {id: 'R02'}), (t:TipoMotivo {nome: 'ColecaoMuitoAntiga'})
+MATCH (r:PosicaoRede)-[:RECEBE_DIAGNOSTICO]->(:Diagnostico)-[:CLASSIFICADO_COMO]->(s:SituacaoGiroIdade),
+      (r)-[:REFERE_SE_A]->(pc:ProdutoCor)
+WHERE s.nome IN ['SemGiroEmAtencao', 'PotencialmenteObsoleto']
+  AND r.dataReferencia > pc.dataLancamento + duration({months: $idade_meses_baixa})
+CREATE (r)-[:TEM_MOTIVO]->(mo:Motivo {id: r.id + '-ColecaoMuitoAntiga',
+        justificativa: 'Lançado em ' + toString(pc.dataLancamento) + ': ' + toString(r.idadeMeses) + ' meses (mais de '
+                       + toString($idade_meses_baixa) + ') e ' + toString(r.diasSemVenda) + ' dias sem venda'})
+CREATE (mo)-[:DO_TIPO_MOTIVO]->(t)
+CREATE (mo)-[:GERADO_POR_REGRA]->(regra)
+CREATE (mo)-[:SUSTENTADO_POR]->(:Evidencia {id: mo.id + '-E', criterio: 'M07 coleção com mais de 5 anos sem giro',
+        valorObservado: r.idadeMeses, limite: $idade_meses_baixa, justificativa: mo.justificativa})
 RETURN count(mo) AS motivos;

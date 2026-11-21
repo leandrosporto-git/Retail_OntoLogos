@@ -7,7 +7,7 @@ Projeto Final de Programação (INF2102, PUC-Rio), de Leandro Porto, com orienta
 Continua o relatório técnico *Ontologia para diagnóstico e destinação de estoques obsoletos no Varejo de Moda*
 (Monografias em Ciência da Computação nº 06/2026, DI/PUC-Rio).
 
-> **Estado:** versão 0.2.0 (ontologia V_Zero), prova de conceito em desenvolvimento. Os dados de exemplo são
+> **Estado:** versão 0.3.0 (ontologia V_Zero, revisada pelo especialista em 20/11/2026), prova de conceito em desenvolvimento. Os dados de exemplo são
 > fictícios (marcas e filiais inventadas). Os limites das regras (24 meses e 180 dias) seguem o documento de
 > definições validado em 17/11/2026; a definição de venda válida e a fórmula de excesso ainda estão em aberto.
 
@@ -24,9 +24,11 @@ Continua o relatório técnico *Ontologia para diagnóstico e destinação de es
      atenção, Potencialmente obsoleto** ou **Diagnóstico pendente** (mais de 180 dias sem venda × mais de 24 meses
      desde o lançamento, limites estritos), com as evidências de cada critério;
    - **R02 motivos:** registra motivos que coexistem com a situação (marca descontinuada, produto com defeito,
-     produto cancelado, oportunidade local, bloqueio de envio, contínuo com sinal de obsolescência);
+     produto cancelado, oportunidade local, bloqueio de envio, contínuo com sinal de obsolescência, coleção com mais
+     de 5 anos sem giro);
    - **R03 recomendação:** sugere a destinação de cada motivo e de cada potencialmente obsoleto (transferência,
-     ação comercial, baixa, recolher e enviar à filial de defeito, manter no CD, revisar classificação) e ordena
+     ação comercial, baixa para produto sem valor comercial (marca descontinuada, coleção com mais de 5 anos,
+     defeito sem giro), recolher e enviar à filial de defeito, manter no CD, revisar classificação) e ordena
      as recomendações pelo custo de oportunidade.
 4. Mostra tudo numa interface web (Streamlit), incluindo, para cada diagnóstico, as evidências, a regra e a versão.
 
@@ -83,7 +85,7 @@ entre o grafo e a ontologia. Sem Neo4j disponível, os testes que dependem do ba
 ## Como mudar uma regra
 
 1. Ajuste os limites em `regras/parametros.yaml` ou a consulta no arquivo `.cypher` correspondente.
-2. Suba `versao_regras` em `parametros.yaml` e a versão no cabeçalho da regra (`// regra: R01 | versao: 0.2.0 | ...`).
+2. Suba `versao_regras` em `parametros.yaml` e a versão no cabeçalho da regra (`// regra: R01 | versao: 0.3.0 | ...`).
 3. Rode `python -m retail_ontologos.motor` e `python -m pytest`.
 
 ## Licença

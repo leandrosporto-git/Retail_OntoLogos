@@ -32,7 +32,7 @@ ENUMERACOES = {
     "TipoMotivo": [], "AcaoDestinacao": [],
     "TipoColecao": ["ValorClassificacao"], "TipoRestricao": ["ValorClassificacao"],
 }
-CANAL = {"Loja": "CanalLoja", "Ecommerce": "CanalEcommerce", "Atacado": "CanalAtacado"}
+CANAL = {"Fisico": "CanalFisico", "Digital": "CanalDigital", "Atacado": "CanalAtacado"}
 TIPO_FILIAL = {"Venda": "FilialVenda", "Estoque": "FilialEstoque", "Defeito": "FilialDefeito"}
 
 
@@ -109,7 +109,7 @@ def carregar_dados(sessao, pasta: Path) -> dict[str, int]:
         CREATE (c:Colecao {codigo: l.codigo, nome: l.nome, temporada: l.temporada, ano: toInteger(l.ano),
                            inicioColecao: date(l.inicio_colecao), inicioSale: date(l.inicio_sale),
                            inicioOff1: date(l.inicio_off1), inicioOff2: date(l.inicio_off2),
-                           inicioOffPC: date(l.inicio_offpc)})
+                           inicioOff3: date(l.inicio_off3)})
         CREATE (c)-[:COLECAO_DA_MARCA]->(m)""", linhas=colecoes)
 
     filiais = _vazio_para_none(_ler_csv(pasta, "filiais"))
