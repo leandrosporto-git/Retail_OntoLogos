@@ -133,7 +133,7 @@ with aba_visao:
                         f"{num(len(grupo))} referências ({pct(len(grupo), tot_refs)})</small>",
                         unsafe_allow_html=True)
             st.button("Mostrando" if selecionado else "Ver no gráfico", key=f"card_{nome}", on_click=escolher,
-                      args=(rotulo,), type="primary" if selecionado else "secondary", use_container_width=True)
+                      args=(rotulo,), type="primary" if selecionado else "secondary", width="stretch")
     visao = filtro if st.session_state.cluster is None else filtro[filtro["Situação"] == st.session_state.cluster]
 
     st.subheader("Demanda × idade do estoque" + (f": {st.session_state.cluster}" if st.session_state.cluster else ""))
@@ -156,7 +156,7 @@ with aba_visao:
     regra = alt.Chart(pd.DataFrame({"x": [limite]})).mark_rule(strokeDash=[6, 4], color="#888").encode(x="x:Q")
     texto = alt.Chart(pd.DataFrame({"x": [limite], "t": [f"{limite} meses"]})).mark_text(
         align="left", dx=4, dy=-6, color="#666", baseline="top").encode(x="x:Q", y=alt.value(0), text="t:N")
-    st.altair_chart(alt.layer(regra, texto, dispersao).properties(height=420), use_container_width=True)
+    st.altair_chart(alt.layer(regra, texto, dispersao).properties(height=420), width="stretch")
     nota = f"Cada ponto é um produto-cor. A linha tracejada marca o limite de idade da regra ({limite} meses)."
     if sem_data:
         nota += f" {sem_data} produto(s)-cor sem data de lançamento não aparecem no gráfico (diagnóstico pendente)."
@@ -164,7 +164,7 @@ with aba_visao:
 
     st.subheader("Produtos-cor ordenados por custo de oportunidade")
     st.dataframe(visao.sort_values("Custo de oportunidade (R$)", ascending=False, na_position="last"),
-                 hide_index=True, use_container_width=True)
+                 hide_index=True, width="stretch")
     alertas = consultar("""
         MATCH (r:PosicaoRede)-[:REFERE_SE_A]->(pc) WHERE r.alertaConsistencia IS NOT NULL
         RETURN pc.codigo AS `Produto-cor`, r.saldoRede AS Saldo, r.alertaConsistencia AS Alerta""")
@@ -205,11 +205,11 @@ with aba_motivos:
         RETURN rec.prioridade AS Prioridade, pc.codigo AS `Produto-cor`,
                coalesce(t.descricao, 'Diagnóstico') AS `Considera`, a.descricao AS `Ação`,
                rec.percentualSugerido AS `%`, rec.justificativa AS Justificativa
-        ORDER BY Prioridade"""), hide_index=True, use_container_width=True)
+        ORDER BY Prioridade"""), hide_index=True, width="stretch")
 
 with aba_regras:
     st.dataframe(consultar("""
         MATCH (r:RegraNegocio)
         RETURN r.id AS Regra, r.versao AS `Versão`, r.areaResponsavel AS `Área`, r.arquivo AS Arquivo
-        ORDER BY Regra"""), hide_index=True, use_container_width=True)
+        ORDER BY Regra"""), hide_index=True, width="stretch")
     st.markdown("Cada regra é um arquivo `.cypher` na pasta `regras/`, e os limites ficam em `regras/parametros.yaml`.")
