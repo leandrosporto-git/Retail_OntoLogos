@@ -124,7 +124,8 @@ with aba_visao:
         grupo = filtro[filtro["Situação"] == rotulo]
         selecionado = st.session_state.cluster == rotulo
         with coluna.container(border=True):
-            st.markdown(f"**{rotulo}**")
+            # Altura fixa do título: "Potencialmente obsoleto" quebra em duas linhas e desalinhava os cards.
+            st.markdown(f"<div style='min-height:3.2em;font-weight:600'>{rotulo}</div>", unsafe_allow_html=True)
             custo = grupo["Custo de oportunidade (R$)"].sum()
             st.metric("Custo de oportunidade", f"R$ {num(custo)}")
             st.markdown(f"<small>({pct(custo, tot_custo)})<br>"
