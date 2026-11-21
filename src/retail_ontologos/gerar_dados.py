@@ -44,21 +44,21 @@ MARCAS_PRODUTO = ["AUR", "BRS", "COR", "DUN", "ESM"]
 
 FILIAIS = [
     # codigo, nome atual, nomes anteriores, fachada, canal, tipo, cidade, estado, regiao, abertura, fechamento
-    ("F01", "OUTLET RIO CM", ["RIO OUTLET", "OUTLET RIO SB"], "OUT", "Loja", "Venda", "Rio de Janeiro", "RJ", "Sudeste", date(2019, 3, 1), None),
-    ("F02", "OUTLET SP CM", ["SP OUTLET"], "OUT", "Loja", "Venda", "São Paulo", "SP", "Sudeste", date(2018, 8, 15), None),
-    ("F03", "OUTLET BH CM", ["BH OUTLET", "OUTLET BH SB"], "OUT", "Loja", "Venda", "Belo Horizonte", "MG", "Sudeste", date(2020, 5, 10), None),
-    ("F04", "OUTLET CURITIBA CM", [], "OUT", "Loja", "Venda", "Curitiba", "PR", "Sul", date(2021, 2, 1), None),
-    ("F05", "OUTLET RECIFE CM", [], "OUT", "Loja", "Venda", "Recife", "PE", "Nordeste", date(2022, 9, 1), None),
-    ("F06", "OUTLET BRASILIA CM", ["BRASILIA OUTLET"], "OUT", "Loja", "Venda", "Brasília", "DF", "Centro-Oeste", date(2019, 11, 20), None),
-    ("F07", "OUTLET FLORIPA CM", [], "OUT", "Loja", "Venda", "Florianópolis", "SC", "Sul", date(2026, 5, 2), None),  # loja nova
-    ("F08", "OUTLET ECOM CM", [], "OUT", "Ecommerce", "Venda", "São Paulo", "SP", "Sudeste", date(2020, 1, 1), None),
-    ("F09", "CD OUTLET CM", ["CDS OUTLET LOJAS"], "OUT", "Loja", "Estoque", "Rio de Janeiro", "RJ", "Sudeste", date(2018, 1, 1), None),
-    ("F10", "QUALIDADE OUTLET CM", [], "OUT", "Loja", "Defeito", "Rio de Janeiro", "RJ", "Sudeste", date(2018, 1, 1), None),
-    ("F11", "PONTA DE ESTOQUE CM", [], "OUT", "Loja", "Defeito", "Rio de Janeiro", "RJ", "Sudeste", date(2018, 1, 1), None),
-    ("F12", "OUTLET SALVADOR CM", [], "OUT", "Loja", "Venda", "Salvador", "BA", "Nordeste", date(2017, 4, 1), date(2025, 12, 31)),  # fechada
+    ("F01", "OUTLET RIO CM", ["RIO OUTLET", "OUTLET RIO SB"], "OUT", "Fisico", "Venda", "Rio de Janeiro", "RJ", "Sudeste", date(2019, 3, 1), None),
+    ("F02", "OUTLET SP CM", ["SP OUTLET"], "OUT", "Fisico", "Venda", "São Paulo", "SP", "Sudeste", date(2018, 8, 15), None),
+    ("F03", "OUTLET BH CM", ["BH OUTLET", "OUTLET BH SB"], "OUT", "Fisico", "Venda", "Belo Horizonte", "MG", "Sudeste", date(2020, 5, 10), None),
+    ("F04", "OUTLET CURITIBA CM", [], "OUT", "Fisico", "Venda", "Curitiba", "PR", "Sul", date(2021, 2, 1), None),
+    ("F05", "OUTLET RECIFE CM", [], "OUT", "Fisico", "Venda", "Recife", "PE", "Nordeste", date(2022, 9, 1), None),
+    ("F06", "OUTLET BRASILIA CM", ["BRASILIA OUTLET"], "OUT", "Fisico", "Venda", "Brasília", "DF", "Centro-Oeste", date(2019, 11, 20), None),
+    ("F07", "OUTLET FLORIPA CM", [], "OUT", "Fisico", "Venda", "Florianópolis", "SC", "Sul", date(2026, 5, 2), None),  # loja nova
+    ("F08", "OUTLET ECOM CM", [], "OUT", "Digital", "Venda", "São Paulo", "SP", "Sudeste", date(2020, 1, 1), None),
+    ("F09", "CD OUTLET CM", ["CDS OUTLET LOJAS"], "OUT", "Fisico", "Estoque", "Rio de Janeiro", "RJ", "Sudeste", date(2018, 1, 1), None),
+    ("F10", "QUALIDADE OUTLET CM", [], "OUT", "Fisico", "Defeito", "Rio de Janeiro", "RJ", "Sudeste", date(2018, 1, 1), None),
+    ("F11", "PONTA DE ESTOQUE CM", [], "OUT", "Fisico", "Defeito", "Rio de Janeiro", "RJ", "Sudeste", date(2018, 1, 1), None),
+    ("F12", "OUTLET SALVADOR CM", [], "OUT", "Fisico", "Venda", "Salvador", "BA", "Nordeste", date(2017, 4, 1), date(2025, 12, 31)),  # fechada
     # Filiais fora do escopo da rede outlet: lojas e CD das marcas
-    ("M01", "AURORA IPANEMA CM", [], "AUR", "Loja", "Venda", "Rio de Janeiro", "RJ", "Sudeste", date(2015, 1, 1), None),
-    ("M02", "BRISA OSCAR FREIRE CM", [], "BRS", "Loja", "Venda", "São Paulo", "SP", "Sudeste", date(2016, 6, 1), None),
+    ("M01", "AURORA IPANEMA CM", [], "AUR", "Fisico", "Venda", "Rio de Janeiro", "RJ", "Sudeste", date(2015, 1, 1), None),
+    ("M02", "BRISA OSCAR FREIRE CM", [], "BRS", "Fisico", "Venda", "São Paulo", "SP", "Sudeste", date(2016, 6, 1), None),
     ("M03", "CD MARCAS CM", [], "AUR", "Atacado", "Estoque", "Rio de Janeiro", "RJ", "Sudeste", date(2014, 1, 1), None),
 ]
 NOME_ATUAL = {f[0]: f[1] for f in FILIAIS}
@@ -87,7 +87,7 @@ TEMPORADAS = [("VER", "Verão", 6), ("INV", "Inverno", 1)]  # mês de início da
 def _colecoes() -> list[dict]:
     linhas = []
     for marca in MARCAS_PRODUTO:
-        for ano in range(2022, 2028):
+        for ano in range(2020, 2028):
             for sigla, nome, mes in TEMPORADAS:
                 inicio = date(ano - 1 if sigla == "VER" else ano, mes, 1)
                 linhas.append({
@@ -96,8 +96,8 @@ def _colecoes() -> list[dict]:
                     "inicio_colecao": inicio.isoformat(),
                     "inicio_sale": (inicio + timedelta(days=182)).isoformat(),
                     "inicio_off1": meses_antes(inicio, -12).isoformat(),
-                    "inicio_off2": meses_antes(inicio, -24).isoformat(),
-                    "inicio_offpc": meses_antes(inicio, -36).isoformat(),
+                    "inicio_off2": meses_antes(inicio, -18).isoformat(),
+                    "inicio_off3": meses_antes(inicio, -24).isoformat(),
                 })
     return linhas
 
@@ -129,6 +129,8 @@ CASOS_CONTROLE = [
     ("CTRL-CANCELADO", "DUN", 6, [("F01", 35)], [("F01", 5, "venda")], "Ativo", {"cancelado": True}),
     ("CTRL-BLOQUEIO", "AUR", 20, [(FILIAL_CD, 200)], [("F01", 250, "venda")], "SemGiroEmAtencao", {"bloqueio": "F02"}),
     ("CTRL-DEFEITO", "BRS", 12, [(FILIAL_QUALIDADE, 12), ("F02", 40)], [("F02", 8, "venda")], "Ativo", {}),
+    ("CTRL-MUITO-ANTIGO", "DUN", 70, [("F04", 50)], [("F04", 250, "venda")], "PotencialmenteObsoleto", {}),
+    ("CTRL-DEFEITO-SEM-GIRO", "COR", 30, [(FILIAL_QUALIDADE, 20)], [("F02", 220, "venda")], "PotencialmenteObsoleto", {}),
     ("CTRL-NOME-ANTIGO", "COR", 30, [("F03", 25)], [("OUTLET BH SB", 12, "venda")], "AntigoComGiro", {}),
     ("CTRL-FORA-ESCOPO", "AUR", 30, [("M01", 60)], [("M01", 5, "venda")], None, {}),
 ]
@@ -169,7 +171,7 @@ def gerar(n_produtos: int = 120, semente: int = 42) -> dict[str, list[dict]]:
         produto = f"P{i:05d}"
         produtos.append({"produto": produto, "marca": marca, "descricao": f"{sub} {rnd.choice(['Básica', 'Estampada', 'Linho', 'Malha', 'Jeans'])}",
                          "negocio": neg, "linha": lin, "grupo": gru, "subgrupo": sub})
-        lancamento_base = R - timedelta(days=rnd.randint(30, 1200))
+        lancamento_base = R - timedelta(days=rnd.randint(30, 1950))
         for cor in rnd.sample(CORES, rnd.randint(1, 3)):
             pc = f"{produto}-{cor[:3].upper()}"
             lancamento = lancamento_base + timedelta(days=rnd.randint(0, 60))

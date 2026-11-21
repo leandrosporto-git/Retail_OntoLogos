@@ -1,4 +1,4 @@
-// regra: R01 | versao: 0.2.0 | area: Planejamento
+// regra: R01 | versao: 0.3.0 | area: Planejamento
 // descricao: Classifica cada posição na rede com saldo positivo pelo fluxograma de giro e idade: dados insuficientes -> Diagnóstico pendente; senão cruza mais de 180 dias sem venda válida na rede com mais de 24 meses desde o lançamento (limites estritos, meses de calendário). Saldo zero ou negativo fica fora do universo.
 MATCH (regra:RegraNegocio {id: 'R01'})
 MATCH (r:PosicaoRede)-[:REFERE_SE_A]->(pc:ProdutoCor)

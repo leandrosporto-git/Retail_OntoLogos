@@ -3,7 +3,7 @@
 As questões de competência (CQs) delimitam o que a ontologia e o software precisam responder
 (Grüninger e Fox, 1995). Cada CQ abaixo vira um teste automatizado em `tests/test_questoes_competencia.py`.
 
-**Origem:** as CQs da versão 0.2.0 (ontologia V_Zero) seguem o documento de definições de estoque obsoleto
+**Origem:** as CQs da versão 0.3.0 (ontologia V_Zero) seguem o documento de definições de estoque obsoleto
 usado como base do projeto e as decisões de validação de 17/11/2026. Elas substituem as CQs da versão 0.1.0,
 que vinham da seção 4.2 do relatório técnico MCC 06/2026 (Porto e Lifschitz) e continuam cobertas: classificação
 (CQ01, CQ02), indicadores e evidências (CQ03, CQ04), fatores (CQ05, CQ06), destinação (CQ11) e regras (CQ09).
@@ -23,6 +23,7 @@ que vinham da seção 4.2 do relatório técnico MCC 06/2026 (Porto e Lifschitz)
 | CQ09 | Toda recomendação é rastreável? | Toda recomendação considera um diagnóstico ou motivo, sugere uma ação e aponta a regra versionada; todo potencialmente obsoleto e todo motivo (exceto defeito) tem recomendação |
 | CQ10 | O que fica fora por dado inconsistente ou incompleto? | Saldo negativo gera alerta e não recebe diagnóstico; sem data de lançamento, só Diagnóstico pendente |
 | CQ11 | Qual destinação cada motivo recebe? | Cancelado → recolher e enviar à filial de defeito; bloqueio → manter no CD (causa provável da falta de venda); contínuo → revisar classificação |
+| CQ12 | Quando recomendar baixa? | Só para produto sem valor comercial: marca descontinuada, coleção com mais de 5 anos sem giro (no lugar da ação comercial) e peças com defeito sem giro. Potencialmente obsoleto até 5 anos recebe ação comercial |
 
 ## Situações de giro e idade
 
@@ -35,7 +36,7 @@ que vinham da seção 4.2 do relatório técnico MCC 06/2026 (Porto e Lifschitz)
 | Diagnóstico pendente | sem data de lançamento ou janela de vendas incompleta | |
 
 Os limites ficam em `regras/parametros.yaml`. Potencialmente obsoleto recomenda avaliar destinação e write-off
-por ação comercial, **sem baixa automática**.
+por ação comercial, **sem baixa automática**. A exceção é o produto sem valor comercial (CQ12), revisão de 20/11/2026.
 
 **Custo de oportunidade (proposta original do projeto, não vem do documento de definições):**
 valor a custo × taxa anual de custo de capital (15%) × dias sem venda / 365.

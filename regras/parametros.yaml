@@ -1,7 +1,7 @@
 # Parâmetros das regras de diagnóstico e destinação (V_Zero, validada em 17/11/2026).
 # Os limites seguem o documento de definições validado com o especialista de domínio.
 # Mudou um limite? Suba a versão das regras.
-versao_regras: "0.2.0"
+versao_regras: "0.3.0"
 
 data_referencia: "2026-10-31"          # data da foto de estoque avaliada
 inicio_historico_vendas: "2024-01-01"  # início da janela de vendas disponível
@@ -15,6 +15,7 @@ limites:
   idade_meses: 24         # "mais de 24 meses" desde o lançamento (meses de calendário, estrito)
   dias_sem_venda: 180     # "mais de 180 dias" sem venda válida na rede (estrito)
   meses_filial_nova: 12   # filial com até 12 meses de abertura é nova (critério SSS)
+  idade_meses_baixa: 60   # "coleção com mais de 5 anos": sem valor comercial, candidata à baixa (revisão de 20/11/2026)
 
 venda_valida:
   tipos: [venda]          # cancelamento e devolução não contam como venda válida (definição pendente)
@@ -24,3 +25,4 @@ financeiro:
 
 destinacao:
   percentual_baixa_marca_descontinuada: 100
+  percentual_baixa_sem_valor_comercial: 100   # coleção com mais de 5 anos e defeito sem giro
