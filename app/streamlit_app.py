@@ -100,7 +100,22 @@ def escolher(situacao):
     st.session_state.cluster = None if st.session_state.cluster == situacao else situacao
 
 
+def num(x) -> str:
+    return f"{x:,.0f}".replace(",", ".")
+
+
+def pct(parte, todo) -> str:
+    return f"{(100 * parte / todo if todo else 0):.0f}% do total"
+
+
 with aba_visao:
+    tot_refs, tot_pecas = len(filtro), filtro["Saldo"].sum()
+    tot_valor, tot_custo = filtro["Valor a custo (R$)"].sum(), filtro["Custo de oportunidade (R$)"].sum()
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Produtos-cor (referências)", num(tot_refs))
+    c2.metric("Peças em estoque", num(tot_pecas))
+    c3.metric("Estoque a custo", f"R$ {num(tot_valor)}")
+    c4.metric("Custo de oportunidade", f"R$ {num(tot_custo)}")
     st.caption("Clique num card para ver só os produtos-cor daquela situação no gráfico e na tabela; clique de novo "
                "para voltar a todos.")
     cards = st.columns(len(SITUACOES))
@@ -110,8 +125,12 @@ with aba_visao:
         selecionado = st.session_state.cluster == rotulo
         with coluna.container(border=True):
             st.markdown(f"**{rotulo}**")
-            st.metric("Custo de oportunidade", f"R$ {grupo['Custo de oportunidade (R$)'].sum():,.0f}".replace(",", "."))
-            st.caption(f"{len(grupo)} produtos-cor · {int(grupo['Saldo'].sum()):,} peças".replace(",", "."))
+            custo = grupo["Custo de oportunidade (R$)"].sum()
+            st.metric("Custo de oportunidade", f"R$ {num(custo)}")
+            st.markdown(f"<small>({pct(custo, tot_custo)})<br>"
+                        f"{num(grupo['Saldo'].sum())} peças ({pct(grupo['Saldo'].sum(), tot_pecas)})<br>"
+                        f"{num(len(grupo))} referências ({pct(len(grupo), tot_refs)})</small>",
+                        unsafe_allow_html=True)
             st.button("Mostrando" if selecionado else "Ver no gráfico", key=f"card_{nome}", on_click=escolher,
                       args=(rotulo,), type="primary" if selecionado else "secondary", use_container_width=True)
     visao = filtro if st.session_state.cluster is None else filtro[filtro["Situação"] == st.session_state.cluster]
